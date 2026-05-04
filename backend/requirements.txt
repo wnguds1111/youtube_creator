@@ -1,0 +1,38 @@
+# AutoTube v2 - Ultra Edition Dependencies
+# ═══════════════════════════════════════
+
+# Core AI - Gemini
+google-genai>=1.0.0
+
+# Web Framework
+fastapi>=0.104.0
+uvicorn[standard]>=0.24.0
+python-dotenv>=1.0.0
+python-multipart>=0.0.6
+websockets>=12.0
+httpx>=0.25.0
+
+# Article Scraping
+newspaper3k>=0.2.8
+beautifulsoup4>=4.12.0
+lxml>=4.9.0
+lxml_html_clean>=0.1.0
+
+# TTS (Gemini native + gTTS fallback)
+gTTS>=2.4.0
+pydub>=0.25.1
+
+# Image Generation (Pillow for overlay/fallback)
+Pillow>=10.0.0
+
+# Video Assembly
+moviepy>=2.0.0
+numpy>=1.24.0
+
+# YouTube Upload
+google-api-python-client>=2.100.0
+google-auth-oauthlib>=1.1.0
+google-auth-httplib2>=0.1.0
+
+# Flow/Veo Browser Automation (optional)
+# playwright>=1.40.0  # 별도 설치: pip install playwright && playwright install chromium

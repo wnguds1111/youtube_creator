@@ -1,0 +1,9 @@
+__pycache__/
+*.py[cod]
+*$py.class
+.env
+youtube_token.pickle
+client_secrets.json
+output/
+data/
+.vscode/
