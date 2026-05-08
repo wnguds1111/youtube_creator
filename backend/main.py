@@ -51,9 +51,13 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# 정적 파일 (프론트엔드)
+# 정적 파일 (프론트엔드 및 아웃풋)
 FRONTEND_DIR = os.path.join(os.path.dirname(__file__), "..", "frontend")
 OUTPUT_DIR = os.path.join(os.path.dirname(__file__), "..", "output")
+
+# 마운트 전 폴더가 존재하지 않으면 생성 (Railway 등에서 폴더 누락으로 인한 에러 방지)
+os.makedirs(OUTPUT_DIR, exist_ok=True)
+os.makedirs(FRONTEND_DIR, exist_ok=True)
 
 app.mount("/output", StaticFiles(directory=OUTPUT_DIR), name="output")
 
