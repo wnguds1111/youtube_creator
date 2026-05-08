@@ -11,7 +11,7 @@ from pathlib import Path
 from datetime import datetime
 from typing import Optional
 
-from fastapi import FastAPI, HTTPException, WebSocket, WebSocketDisconnect
+from fastapi import FastAPI, HTTPException, WebSocket, WebSocketDisconnect, UploadFile, File
 from fastapi.staticfiles import StaticFiles
 from fastapi.responses import FileResponse, JSONResponse
 from fastapi.middleware.cors import CORSMiddleware
@@ -20,6 +20,8 @@ from dotenv import load_dotenv
 
 from pipeline import Pipeline
 from credit_tracker import get_tracker
+from db import db
+from fastapi import Depends, Header
 
 # ═══════════════════════════════════════
 # 설정
@@ -65,17 +67,15 @@ websocket_connections = {}  # job_id -> WebSocket
 # ═══════════════════════════════════════
 # 요청 / 응답 모델
 # ═══════════════════════════════════════
-class CreateRequest(BaseModel):
+class PrepareRequest(BaseModel):
     url: str
     language: str = "ko"
     gemini_model: str = "gemini-2.5-flash"
     tts_voice: str = "Kore"
     tts_speed: float = 1.0
-    video_width: int = 1920
-    video_height: int = 1080
-    use_flow: bool = False
-    veo_quality: str = "fast"
-
+    video_width: int = 1080
+    video_height: int = 1920
+    target_duration: int = 50
 
 class JobStatus(BaseModel):
     job_id: str
@@ -85,6 +85,19 @@ class JobStatus(BaseModel):
     progress_message: Optional[str] = None
     result: Optional[dict] = None
     error: Optional[str] = None
+
+class AuthRequest(BaseModel):
+    username: str
+    password: str
+
+async def get_current_user(authorization: str = Header(None)):
+    if not authorization or not authorization.startswith("Bearer "):
+        raise HTTPException(status_code=401, detail="인증이 필요합니다.")
+    token = authorization.split(" ")[1]
+    username = db.get_user_from_session(token)
+    if not username:
+        raise HTTPException(status_code=401, detail="유효하지 않은 토큰입니다.")
+    return username
 
 
 # ═══════════════════════════════════════
@@ -107,31 +120,66 @@ async def serve_js():
     return FileResponse(os.path.join(FRONTEND_DIR, "app.js"), media_type="application/javascript")
 
 
-@app.post("/api/create", response_model=JobStatus)
-async def create_video(request: CreateRequest):
-    """영상 생성 작업을 시작합니다"""
-    gemini_key = os.getenv("GEMINI_API_KEY")
-    if not gemini_key or gemini_key == "your_gemini_api_key_here":
-        raise HTTPException(
-            status_code=400,
-            detail="GEMINI_API_KEY가 설정되지 않았습니다. .env 파일을 확인하세요."
-        )
+@app.post("/api/auth/register")
+async def auth_register(req: AuthRequest):
+    success, msg = db.register(req.username, req.password)
+    if not success:
+        raise HTTPException(status_code=400, detail=msg)
+    return {"message": msg}
 
-    job_id = datetime.now().strftime("%Y%m%d_%H%M%S")
+@app.post("/api/auth/login")
+async def auth_login(req: AuthRequest):
+    token = db.login(req.username, req.password)
+    if not token:
+        raise HTTPException(status_code=401, detail="아이디 또는 비밀번호가 틀렸습니다.")
+    return {"token": token, "username": req.username}
 
-    # 초기 상태
-    active_jobs[job_id] = {
-        "job_id": job_id,
-        "status": "queued",
-        "url": request.url,
-        "current_step": None,
-        "steps_completed": [],
-        "progress_message": "작업 대기 중...",
-        "result": None,
-        "error": None,
+class GoogleAuthRequest(BaseModel):
+    token: str
+
+@app.get("/api/auth/me")
+async def auth_me(username: str = Depends(get_current_user)):
+    user_info = db.users.get(username, {})
+    return {
+        "username": username,
+        "name": user_info.get("name"),
+        "picture": user_info.get("picture"),
+        "auth_provider": user_info.get("auth_provider", "local")
     }
 
-    # 백그라운드에서 파이프라인 실행
+@app.post("/api/auth/google")
+async def auth_google(req: GoogleAuthRequest):
+    import requests
+    # Verify the token
+    verify_url = f"https://oauth2.googleapis.com/tokeninfo?id_token={req.token}"
+    response = requests.get(verify_url)
+    if response.status_code != 200:
+        raise HTTPException(status_code=401, detail="유효하지 않은 구글 토큰입니다.")
+    user_info = response.json()
+    email = user_info.get("email")
+    name = user_info.get("name", email.split("@")[0] if email else "User")
+    picture = user_info.get("picture")
+    
+    if not email:
+        raise HTTPException(status_code=400, detail="이메일 정보를 가져올 수 없습니다.")
+        
+    token = db.google_login(email, name, picture)
+    return {"token": token, "username": email, "name": name, "picture": picture}
+
+@app.post("/api/auth/logout")
+async def auth_logout(authorization: str = Header(None)):
+    if authorization and authorization.startswith("Bearer "):
+        token = authorization.split(" ")[1]
+        db.logout(token)
+    return {"message": "로그아웃 완료"}
+
+@app.post("/api/prepare")
+async def prepare_video(request: PrepareRequest, username: str = Depends(get_current_user)):
+    """1단계: 기사 추출 및 대본, 프롬프트 생성"""
+    gemini_key = os.getenv("GEMINI_API_KEY")
+    if not gemini_key or gemini_key == "your_gemini_api_key_here":
+        raise HTTPException(status_code=400, detail="GEMINI_API_KEY가 설정되지 않았습니다. .env 파일을 확인하세요.")
+
     config = {
         "gemini_api_key": gemini_key,
         "gemini_model": request.gemini_model,
@@ -141,13 +189,88 @@ async def create_video(request: CreateRequest):
         "tts_speed": request.tts_speed,
         "video_width": request.video_width,
         "video_height": request.video_height,
-        "use_flow": request.use_flow,
-        "veo_quality": request.veo_quality,
+        "target_duration": request.target_duration,
         "output_dir": OUTPUT_DIR,
+        "owner": username,
     }
 
-    asyncio.create_task(_run_pipeline(job_id, request.url, config))
+    pipeline = Pipeline(config)
+    try:
+        # 동기 작업이므로 백그라운드 없이 즉시 반환
+        result = pipeline.prepare(request.url)
+        
+        # 설정 저장 (2단계에서 사용하기 위함)
+        project_dir = os.path.join(OUTPUT_DIR, result["project_id"])
+        with open(os.path.join(project_dir, "config.json"), "w", encoding="utf-8") as f:
+            json.dump(config, f, ensure_ascii=False, indent=2)
+            
+        return JSONResponse(content=result)
+    except Exception as e:
+        logger.error(f"Prepare failed: {e}", exc_info=True)
+        raise HTTPException(status_code=500, detail=str(e))
 
+@app.post("/api/assemble/{job_id}", response_model=JobStatus)
+async def assemble_video(
+    job_id: str, 
+    files: list[UploadFile] = File(...), 
+    username: str = Depends(get_current_user)
+):
+    """2단계: 업로드된 영상으로 최종 결과물 조립"""
+    project_dir = os.path.join(OUTPUT_DIR, job_id)
+    if not os.path.exists(project_dir):
+        raise HTTPException(status_code=404, detail="Project not found")
+        
+    config_path = os.path.join(project_dir, "config.json")
+    if not os.path.exists(config_path):
+        raise HTTPException(status_code=400, detail="Config not found for this project")
+        
+    with open(config_path, "r", encoding="utf-8") as f:
+        config = json.load(f)
+        
+    # 권한 체크
+    if config.get("owner") != username:
+        raise HTTPException(status_code=403, detail="본인의 프로젝트만 조립할 수 있습니다.")
+
+    # 파일 저장
+    veo_clips_dir = os.path.join(project_dir, "veo_clips")
+    os.makedirs(veo_clips_dir, exist_ok=True)
+    
+    saved_paths = []
+    # 파일 이름 순으로 정렬 (scene_1.mp4, scene_2.mp4 등에 매핑하기 위해 클라이언트에서 순서대로 보냈다고 가정)
+    for idx, file in enumerate(files):
+        ext = file.filename.split('.')[-1]
+        file_path = os.path.join(veo_clips_dir, f"scene_{idx+1:02d}.{ext}")
+        with open(file_path, "wb") as f:
+            f.write(await file.read())
+        saved_paths.append(file_path)
+
+    # 파이프라인 초기화
+    config["gemini_api_key"] = os.getenv("GEMINI_API_KEY")
+    pipeline = Pipeline(config)
+    
+    active_jobs[job_id] = {
+        "job_id": job_id,
+        "status": "queued",
+        "current_step": None,
+        "steps_completed": [],
+        "progress_message": "영상 조립 대기 중...",
+        "result": None,
+        "error": None,
+    }
+
+    async def _run_assemble():
+        def callback(step, progress, message):
+            active_jobs[job_id]["current_step"] = step
+            active_jobs[job_id]["progress_message"] = message
+            if progress >= 100 and step not in active_jobs[job_id]["steps_completed"]:
+                active_jobs[job_id]["steps_completed"].append(step)
+
+        # 백그라운드 스레드로 실행 (루프 블로킹 방지)
+        loop = asyncio.get_event_loop()
+        result = await loop.run_in_executor(None, lambda: pipeline.assemble(job_id, saved_paths, callback))
+        active_jobs[job_id].update(result)
+
+    asyncio.create_task(_run_assemble())
     return JSONResponse(content=active_jobs[job_id])
 
 
@@ -172,7 +295,7 @@ async def credit_status():
     return JSONResponse(content=tracker.get_status())
 
 @app.get("/api/projects")
-async def list_projects():
+async def list_projects(username: str = Depends(get_current_user)):
     """완료된 프로젝트 목록을 반환합니다"""
     projects = []
     if os.path.exists(OUTPUT_DIR):
@@ -180,8 +303,16 @@ async def list_projects():
             project_dir = os.path.join(OUTPUT_DIR, dirname)
             metadata_path = os.path.join(project_dir, "metadata.json")
             if os.path.isdir(project_dir) and os.path.exists(metadata_path):
-                with open(metadata_path, "r", encoding="utf-8") as f:
-                    metadata = json.load(f)
+                try:
+                    with open(metadata_path, "r", encoding="utf-8") as f:
+                        metadata = json.load(f)
+                except Exception:
+                    continue
+                
+                # 본인 프로젝트만 필터링 (기존 프로젝트 하위호환 위해 owner 없는 경우도 일단 제외)
+                if metadata.get("owner") != username:
+                    continue
+
                 metadata["project_id"] = dirname
                 metadata["has_video"] = os.path.exists(os.path.join(project_dir, "final_video.mp4"))
                 metadata["has_thumbnail"] = os.path.exists(os.path.join(project_dir, "thumbnail.png"))
@@ -190,7 +321,7 @@ async def list_projects():
 
 
 @app.post("/api/upload/{project_id}")
-async def upload_to_youtube(project_id: str, privacy: str = "private"):
+async def upload_to_youtube(project_id: str, privacy: str = "private", username: str = Depends(get_current_user)):
     """완성된 프로젝트를 YouTube에 업로드합니다"""
     from youtube_uploader import YouTubeUploader
 
@@ -205,6 +336,9 @@ async def upload_to_youtube(project_id: str, privacy: str = "private"):
 
     with open(metadata_path, "r", encoding="utf-8") as f:
         metadata = json.load(f)
+
+    if metadata.get("owner") and metadata.get("owner") != username:
+        raise HTTPException(status_code=403, detail="본인의 프로젝트만 업로드할 수 있습니다.")
 
     uploader = YouTubeUploader()
     if not uploader.is_configured:
@@ -223,6 +357,13 @@ async def upload_to_youtube(project_id: str, privacy: str = "private"):
         subtitle_path=subtitle_path if os.path.exists(subtitle_path) else None,
         privacy=privacy,
     )
+
+    if result.get("status") == "success":
+        metadata["youtube_status"] = "success"
+        metadata["youtube_url"] = result.get("url")
+        metadata["youtube_uploaded_at"] = datetime.now().isoformat()
+        with open(metadata_path, "w", encoding="utf-8") as f:
+            json.dump(metadata, f, ensure_ascii=False, indent=2)
 
     return JSONResponse(content=result)
 
@@ -269,65 +410,3 @@ async def _notify_ws(job_id: str, data: dict):
             pass
 
 
-async def _run_pipeline(job_id: str, url: str, config: dict):
-    """백그라운드에서 파이프라인 실행"""
-    active_jobs[job_id]["status"] = "running"
-
-    # 메인 이벤트 루프 참조 저장 (스레드 안전한 콜백을 위해)
-    loop = asyncio.get_running_loop()
-
-    def progress_callback(step, progress, message):
-        active_jobs[job_id]["current_step"] = step
-        active_jobs[job_id]["progress_message"] = message
-        if step not in active_jobs[job_id]["steps_completed"] and progress >= 100:
-            active_jobs[job_id]["steps_completed"].append(step)
-
-        # WebSocket 알림 (스레드 안전하게 메인 루프에 스케줄링)
-        try:
-            loop.call_soon_threadsafe(
-                asyncio.ensure_future,
-                _notify_ws(job_id, {
-                    "type": "progress",
-                    "step": step,
-                    "progress": progress,
-                    "message": message,
-                    "steps_completed": list(active_jobs[job_id]["steps_completed"]),
-                })
-            )
-        except Exception:
-            pass  # 루프가 닫힌 경우 무시
-
-    try:
-        pipeline = Pipeline(config)
-        # 동기 파이프라인을 비동기로 실행
-        result = await loop.run_in_executor(
-            None, lambda: pipeline.run(url, callback=progress_callback)
-        )
-
-        active_jobs[job_id]["status"] = result["status"]
-        active_jobs[job_id]["result"] = result
-        active_jobs[job_id]["error"] = result.get("error")
-
-        await _notify_ws(job_id, {
-            "type": "complete",
-            "status": result["status"],
-            "result": result,
-        })
-
-    except Exception as e:
-        active_jobs[job_id]["status"] = "error"
-        active_jobs[job_id]["error"] = str(e)
-        logger.error(f"❌ 파이프라인 에러: {e}", exc_info=True)
-
-        await _notify_ws(job_id, {
-            "type": "error",
-            "error": str(e),
-        })
-
-
-# ═══════════════════════════════════════
-# 서버 시작
-# ═══════════════════════════════════════
-if __name__ == "__main__":
-    import uvicorn
-    uvicorn.run("main:app", host="0.0.0.0", port=8500, reload=True)

@@ -1,9 +1,23 @@
+# Environments
+.env
+.venv
+env/
+venv/
+ENV/
+env.bak/
+venv.bak/
+
+# Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
 *$py.class
-.env
-youtube_token.pickle
-client_secrets.json
+
+# Output and user data
 output/
-data/
-.vscode/
+backend/users.json
+backend/youtube_token.pickle
+backend/client_secrets.json
+
+# OS files
+.DS_Store
+Thumbs.db

@@ -1,0 +1,687 @@
+{
+  "month": "2026-05",
+  "total_budget": 25000,
+  "used": 396.0,
+  "remaining": 24604.0,
+  "calls": [
+    {
+      "type": "gemini_text",
+      "count": 1,
+      "credits": 0.5,
+      "description": "대본 생성",
+      "timestamp": "2026-05-04T10:42:11.520252"
+    },
+    {
+      "type": "gemini_tts",
+      "count": 6,
+      "credits": 12,
+      "description": "TTS 6장면",
+      "timestamp": "2026-05-04T10:43:57.720283"
+    },
+    {
+      "type": "imagen_image",
+      "count": 6,
+      "credits": 18,
+      "description": "장면 이미지 6개",
+      "timestamp": "2026-05-04T10:43:58.863195"
+    },
+    {
+      "type": "imagen_thumbnail",
+      "count": 1,
+      "credits": 3,
+      "description": "AI 썸네일",
+      "timestamp": "2026-05-04T10:43:59.115555"
+    },
+    {
+      "type": "gemini_text",
+      "count": 1,
+      "credits": 0.5,
+      "description": "대본 생성",
+      "timestamp": "2026-05-04T11:10:28.419699"
+    },
+    {
+      "type": "gemini_tts",
+      "count": 4,
+      "credits": 8,
+      "description": "TTS 4장면",
+      "timestamp": "2026-05-04T11:11:00.104577"
+    },
+    {
+      "type": "imagen_image",
+      "count": 4,
+      "credits": 12,
+      "description": "장면 이미지 4개",
+      "timestamp": "2026-05-04T11:11:00.860883"
+    },
+    {
+      "type": "veo_quality",
+      "count": 0,
+      "credits": 0,
+      "description": "Veo 클립 0개",
+      "timestamp": "2026-05-04T11:11:00.871543"
+    },
+    {
+      "type": "imagen_thumbnail",
+      "count": 1,
+      "credits": 3,
+      "description": "AI 썸네일",
+      "timestamp": "2026-05-04T11:11:01.048088"
+    },
+    {
+      "type": "gemini_text",
+      "count": 1,
+      "credits": 0.5,
+      "description": "대본 생성",
+      "timestamp": "2026-05-04T11:50:19.973542"
+    },
+    {
+      "type": "gemini_text",
+      "count": 1,
+      "credits": 0.5,
+      "description": "대본 생성",
+      "timestamp": "2026-05-04T11:50:31.484747"
+    },
+    {
+      "type": "gemini_tts",
+      "count": 4,
+      "credits": 8,
+      "description": "TTS 4장면",
+      "timestamp": "2026-05-04T11:50:56.312956"
+    },
+    {
+      "type": "imagen_image",
+      "count": 4,
+      "credits": 12,
+      "description": "장면 이미지 4개",
+      "timestamp": "2026-05-04T11:50:57.893149"
+    },
+    {
+      "type": "imagen_thumbnail",
+      "count": 1,
+      "credits": 3,
+      "description": "AI 썸네일",
+      "timestamp": "2026-05-04T11:50:58.277827"
+    },
+    {
+      "type": "gemini_tts",
+      "count": 3,
+      "credits": 6,
+      "description": "TTS 3장면",
+      "timestamp": "2026-05-04T11:51:01.536033"
+    },
+    {
+      "type": "imagen_image",
+      "count": 3,
+      "credits": 9,
+      "description": "장면 이미지 3개",
+      "timestamp": "2026-05-04T11:51:02.795996"
+    },
+    {
+      "type": "veo_quality",
+      "count": 0,
+      "credits": 0,
+      "description": "Veo 클립 0개",
+      "timestamp": "2026-05-04T11:51:02.799609"
+    },
+    {
+      "type": "imagen_thumbnail",
+      "count": 1,
+      "credits": 3,
+      "description": "AI 썸네일",
+      "timestamp": "2026-05-04T11:51:03.163238"
+    },
+    {
+      "type": "gemini_text",
+      "count": 1,
+      "credits": 0.5,
+      "description": "대본 생성",
+      "timestamp": "2026-05-06T17:25:30.903451"
+    },
+    {
+      "type": "gemini_tts",
+      "count": 3,
+      "credits": 6,
+      "description": "TTS 3장면",
+      "timestamp": "2026-05-06T17:26:00.666344"
+    },
+    {
+      "type": "imagen_image",
+      "count": 3,
+      "credits": 9,
+      "description": "장면 이미지 3개",
+      "timestamp": "2026-05-06T17:26:41.044829"
+    },
+    {
+      "type": "veo_quality",
+      "count": 0,
+      "credits": 0,
+      "description": "Veo 클립 0개",
+      "timestamp": "2026-05-06T17:27:18.459284"
+    },
+    {
+      "type": "imagen_thumbnail",
+      "count": 1,
+      "credits": 3,
+      "description": "AI 썸네일",
+      "timestamp": "2026-05-06T17:27:33.379430"
+    },
+    {
+      "type": "gemini_text",
+      "count": 1,
+      "credits": 0.5,
+      "description": "대본 생성",
+      "timestamp": "2026-05-08T10:18:13.217927"
+    },
+    {
+      "type": "gemini_tts",
+      "count": 3,
+      "credits": 6,
+      "description": "TTS 3장면",
+      "timestamp": "2026-05-08T10:18:49.496405"
+    },
+    {
+      "type": "imagen_image",
+      "count": 3,
+      "credits": 9,
+      "description": "장면 이미지 3개",
+      "timestamp": "2026-05-08T10:19:30.431821"
+    },
+    {
+      "type": "veo_fast",
+      "count": 0,
+      "credits": 0,
+      "description": "Veo 클립 0개",
+      "timestamp": "2026-05-08T10:19:33.711597"
+    },
+    {
+      "type": "imagen_thumbnail",
+      "count": 1,
+      "credits": 3,
+      "description": "AI 썸네일",
+      "timestamp": "2026-05-08T10:19:46.341404"
+    },
+    {
+      "type": "gemini_text",
+      "count": 1,
+      "credits": 0.5,
+      "description": "대본 생성",
+      "timestamp": "2026-05-08T10:35:52.776020"
+    },
+    {
+      "type": "gemini_tts",
+      "count": 4,
+      "credits": 8,
+      "description": "TTS 4장면",
+      "timestamp": "2026-05-08T10:36:20.512977"
+    },
+    {
+      "type": "imagen_image",
+      "count": 4,
+      "credits": 12,
+      "description": "장면 이미지 4개",
+      "timestamp": "2026-05-08T10:37:04.742927"
+    },
+    {
+      "type": "veo_quality",
+      "count": 0,
+      "credits": 0,
+      "description": "Veo 클립 0개",
+      "timestamp": "2026-05-08T10:37:06.074997"
+    },
+    {
+      "type": "imagen_thumbnail",
+      "count": 1,
+      "credits": 3,
+      "description": "AI 썸네일",
+      "timestamp": "2026-05-08T10:37:20.832157"
+    },
+    {
+      "type": "gemini_text",
+      "count": 1,
+      "credits": 0.5,
+      "description": "대본 생성",
+      "timestamp": "2026-05-08T10:55:44.191095"
+    },
+    {
+      "type": "gemini_tts",
+      "count": 3,
+      "credits": 6,
+      "description": "TTS 3장면",
+      "timestamp": "2026-05-08T10:56:10.524080"
+    },
+    {
+      "type": "imagen_image",
+      "count": 3,
+      "credits": 9,
+      "description": "장면 이미지 3개",
+      "timestamp": "2026-05-08T10:56:49.576890"
+    },
+    {
+      "type": "veo_quality",
+      "count": 0,
+      "credits": 0,
+      "description": "Veo 클립 0개",
+      "timestamp": "2026-05-08T10:56:50.974196"
+    },
+    {
+      "type": "imagen_thumbnail",
+      "count": 1,
+      "credits": 3,
+      "description": "AI 썸네일",
+      "timestamp": "2026-05-08T10:57:01.809233"
+    },
+    {
+      "type": "gemini_text",
+      "count": 1,
+      "credits": 0.5,
+      "description": "대본 생성",
+      "timestamp": "2026-05-08T11:15:22.783560"
+    },
+    {
+      "type": "gemini_tts",
+      "count": 4,
+      "credits": 8,
+      "description": "TTS 4장면",
+      "timestamp": "2026-05-08T11:15:59.230089"
+    },
+    {
+      "type": "imagen_image",
+      "count": 4,
+      "credits": 12,
+      "description": "장면 이미지 4개",
+      "timestamp": "2026-05-08T11:16:49.307899"
+    },
+    {
+      "type": "veo_quality",
+      "count": 0,
+      "credits": 0,
+      "description": "Veo 클립 0개",
+      "timestamp": "2026-05-08T11:16:50.585266"
+    },
+    {
+      "type": "imagen_thumbnail",
+      "count": 1,
+      "credits": 3,
+      "description": "AI 썸네일",
+      "timestamp": "2026-05-08T11:17:03.277756"
+    },
+    {
+      "type": "gemini_text",
+      "count": 1,
+      "credits": 0.5,
+      "description": "대본 생성",
+      "timestamp": "2026-05-08T11:36:50.638321"
+    },
+    {
+      "type": "gemini_tts",
+      "count": 4,
+      "credits": 8,
+      "description": "TTS 4장면",
+      "timestamp": "2026-05-08T11:37:25.713209"
+    },
+    {
+      "type": "imagen_image",
+      "count": 4,
+      "credits": 12,
+      "description": "장면 이미지 4개",
+      "timestamp": "2026-05-08T11:38:13.958936"
+    },
+    {
+      "type": "veo_quality",
+      "count": 0,
+      "credits": 0,
+      "description": "Veo 클립 0개",
+      "timestamp": "2026-05-08T11:38:15.524436"
+    },
+    {
+      "type": "imagen_thumbnail",
+      "count": 1,
+      "credits": 3,
+      "description": "AI 썸네일",
+      "timestamp": "2026-05-08T11:38:28.327148"
+    },
+    {
+      "type": "gemini_text",
+      "count": 1,
+      "credits": 0.5,
+      "description": "대본 생성",
+      "timestamp": "2026-05-08T11:40:00.617068"
+    },
+    {
+      "type": "gemini_text",
+      "count": 1,
+      "credits": 0.5,
+      "description": "대본 생성",
+      "timestamp": "2026-05-08T11:40:10.129544"
+    },
+    {
+      "type": "gemini_tts",
+      "count": 4,
+      "credits": 8,
+      "description": "TTS 4장면",
+      "timestamp": "2026-05-08T11:40:34.924163"
+    },
+    {
+      "type": "gemini_tts",
+      "count": 3,
+      "credits": 6,
+      "description": "TTS 3장면",
+      "timestamp": "2026-05-08T11:40:36.676827"
+    },
+    {
+      "type": "imagen_image",
+      "count": 4,
+      "credits": 12,
+      "description": "장면 이미지 4개",
+      "timestamp": "2026-05-08T11:41:13.891236"
+    },
+    {
+      "type": "imagen_image",
+      "count": 3,
+      "credits": 9,
+      "description": "장면 이미지 3개",
+      "timestamp": "2026-05-08T11:41:17.052681"
+    },
+    {
+      "type": "veo_quality",
+      "count": 0,
+      "credits": 0,
+      "description": "Veo 클립 0개",
+      "timestamp": "2026-05-08T11:41:18.338991"
+    },
+    {
+      "type": "imagen_thumbnail",
+      "count": 1,
+      "credits": 3,
+      "description": "AI 썸네일",
+      "timestamp": "2026-05-08T11:41:24.049708"
+    },
+    {
+      "type": "imagen_thumbnail",
+      "count": 1,
+      "credits": 3,
+      "description": "AI 썸네일",
+      "timestamp": "2026-05-08T11:41:27.598257"
+    },
+    {
+      "type": "gemini_text",
+      "count": 1,
+      "credits": 0.5,
+      "description": "대본 생성",
+      "timestamp": "2026-05-08T11:55:43.989907"
+    },
+    {
+      "type": "gemini_tts",
+      "count": 4,
+      "credits": 8,
+      "description": "TTS 4장면",
+      "timestamp": "2026-05-08T11:56:15.393082"
+    },
+    {
+      "type": "imagen_image",
+      "count": 4,
+      "credits": 12,
+      "description": "장면 이미지 4개",
+      "timestamp": "2026-05-08T11:56:58.178358"
+    },
+    {
+      "type": "veo_quality",
+      "count": 0,
+      "credits": 0,
+      "description": "Veo 클립 0개",
+      "timestamp": "2026-05-08T11:56:59.632688"
+    },
+    {
+      "type": "imagen_thumbnail",
+      "count": 1,
+      "credits": 3,
+      "description": "AI 썸네일",
+      "timestamp": "2026-05-08T11:57:17.910071"
+    },
+    {
+      "type": "gemini_text",
+      "count": 1,
+      "credits": 0.5,
+      "description": "대본 생성",
+      "timestamp": "2026-05-08T12:20:39.286381"
+    },
+    {
+      "type": "gemini_tts",
+      "count": 4,
+      "credits": 8,
+      "description": "TTS 4장면",
+      "timestamp": "2026-05-08T12:21:04.671530"
+    },
+    {
+      "type": "imagen_image",
+      "count": 4,
+      "credits": 12,
+      "description": "장면 이미지 4개",
+      "timestamp": "2026-05-08T12:21:38.116537"
+    },
+    {
+      "type": "veo_quality",
+      "count": 0,
+      "credits": 0,
+      "description": "Veo 클립 0개",
+      "timestamp": "2026-05-08T12:21:39.500637"
+    },
+    {
+      "type": "imagen_thumbnail",
+      "count": 1,
+      "credits": 3,
+      "description": "AI 썸네일",
+      "timestamp": "2026-05-08T12:21:49.580694"
+    },
+    {
+      "type": "gemini_text",
+      "count": 1,
+      "credits": 0.5,
+      "description": "대본 생성",
+      "timestamp": "2026-05-08T12:32:19.110998"
+    },
+    {
+      "type": "gemini_tts",
+      "count": 3,
+      "credits": 6,
+      "description": "TTS 3장면",
+      "timestamp": "2026-05-08T12:32:42.328181"
+    },
+    {
+      "type": "imagen_image",
+      "count": 3,
+      "credits": 9,
+      "description": "장면 이미지 3개",
+      "timestamp": "2026-05-08T12:33:08.738896"
+    },
+    {
+      "type": "veo_quality",
+      "count": 0,
+      "credits": 0,
+      "description": "Veo 클립 0개",
+      "timestamp": "2026-05-08T12:33:10.054466"
+    },
+    {
+      "type": "imagen_thumbnail",
+      "count": 1,
+      "credits": 3,
+      "description": "AI 썸네일",
+      "timestamp": "2026-05-08T12:33:19.192606"
+    },
+    {
+      "type": "gemini_text",
+      "count": 1,
+      "credits": 0.5,
+      "description": "대본 생성",
+      "timestamp": "2026-05-08T13:31:41.245325"
+    },
+    {
+      "type": "gemini_tts",
+      "count": 3,
+      "credits": 6,
+      "description": "TTS 3장면",
+      "timestamp": "2026-05-08T13:32:05.628840"
+    },
+    {
+      "type": "imagen_image",
+      "count": 3,
+      "credits": 9,
+      "description": "장면 이미지 3개",
+      "timestamp": "2026-05-08T13:32:29.025974"
+    },
+    {
+      "type": "veo_quality",
+      "count": 0,
+      "credits": 0,
+      "description": "Veo 클립 0개",
+      "timestamp": "2026-05-08T13:32:30.814758"
+    },
+    {
+      "type": "imagen_thumbnail",
+      "count": 1,
+      "credits": 3,
+      "description": "AI 썸네일",
+      "timestamp": "2026-05-08T13:32:42.769127"
+    },
+    {
+      "type": "gemini_text",
+      "count": 1,
+      "credits": 0.5,
+      "description": "대본 생성",
+      "timestamp": "2026-05-08T13:44:27.437311"
+    },
+    {
+      "type": "gemini_tts",
+      "count": 4,
+      "credits": 8,
+      "description": "TTS 4장면",
+      "timestamp": "2026-05-08T13:45:07.957222"
+    },
+    {
+      "type": "imagen_image",
+      "count": 4,
+      "credits": 12,
+      "description": "장면 이미지 4개",
+      "timestamp": "2026-05-08T13:45:40.330718"
+    },
+    {
+      "type": "veo_quality",
+      "count": 0,
+      "credits": 0,
+      "description": "Veo 클립 0개",
+      "timestamp": "2026-05-08T13:45:41.864886"
+    },
+    {
+      "type": "imagen_thumbnail",
+      "count": 1,
+      "credits": 3,
+      "description": "AI 썸네일",
+      "timestamp": "2026-05-08T13:45:50.315259"
+    },
+    {
+      "type": "gemini_text",
+      "count": 1,
+      "credits": 0.5,
+      "description": "대본 생성",
+      "timestamp": "2026-05-08T14:00:07.586999"
+    },
+    {
+      "type": "gemini_tts",
+      "count": 3,
+      "credits": 6,
+      "description": "TTS 3장면",
+      "timestamp": "2026-05-08T14:00:29.087325"
+    },
+    {
+      "type": "imagen_image",
+      "count": 3,
+      "credits": 9,
+      "description": "장면 이미지 3개",
+      "timestamp": "2026-05-08T14:00:52.527259"
+    },
+    {
+      "type": "veo_quality",
+      "count": 0,
+      "credits": 0,
+      "description": "Veo 클립 0개",
+      "timestamp": "2026-05-08T14:02:01.681105"
+    },
+    {
+      "type": "imagen_thumbnail",
+      "count": 1,
+      "credits": 3,
+      "description": "AI 썸네일",
+      "timestamp": "2026-05-08T14:02:10.554987"
+    },
+    {
+      "type": "gemini_text",
+      "count": 1,
+      "credits": 0.5,
+      "description": "대본 및 프롬프트 생성",
+      "timestamp": "2026-05-08T14:25:12.341132"
+    },
+    {
+      "type": "gemini_text",
+      "count": 1,
+      "credits": 0.5,
+      "description": "대본 및 프롬프트 생성",
+      "timestamp": "2026-05-08T14:30:26.106560"
+    },
+    {
+      "type": "gemini_text",
+      "count": 1,
+      "credits": 0.5,
+      "description": "대본 및 프롬프트 생성",
+      "timestamp": "2026-05-08T15:22:00.234432"
+    },
+    {
+      "type": "gemini_text",
+      "count": 1,
+      "credits": 0.5,
+      "description": "대본 및 프롬프트 생성",
+      "timestamp": "2026-05-08T15:44:54.724672"
+    },
+    {
+      "type": "gemini_text",
+      "count": 1,
+      "credits": 0.5,
+      "description": "대본 및 프롬프트 생성",
+      "timestamp": "2026-05-08T15:47:02.442229"
+    },
+    {
+      "type": "gemini_text",
+      "count": 1,
+      "credits": 0.5,
+      "description": "대본 및 프롬프트 생성",
+      "timestamp": "2026-05-08T15:53:25.990661"
+    }
+  ],
+  "summary": {
+    "gemini_text": {
+      "count": 24,
+      "credits": 12.0
+    },
+    "gemini_tts": {
+      "count": 66,
+      "credits": 132
+    },
+    "imagen_image": {
+      "count": 66,
+      "credits": 198
+    },
+    "imagen_thumbnail": {
+      "count": 18,
+      "credits": 54
+    },
+    "veo_fast": {
+      "count": 0,
+      "credits": 0
+    },
+    "veo_quality": {
+      "count": 0,
+      "credits": 0
+    }
+  },
+  "videos_created": 15,
+  "last_updated": "2026-05-08T15:53:25.990661"
+}

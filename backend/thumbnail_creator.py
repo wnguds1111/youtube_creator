@@ -169,11 +169,11 @@ class ThumbnailCreator:
         """폰트 로드 (시스템 폰트 폴백)"""
         # Windows 한국어 폰트 경로들
         font_candidates = [
-            os.path.join(self.assets_dir, "fonts", "NanumGothicBold.ttf"),
-            os.path.join(self.assets_dir, "fonts", "NanumGothic.ttf"),
+            "C:/Windows/Fonts/NanumSquareEB.ttf" if bold else "C:/Windows/Fonts/NanumSquareB.ttf",
+            "C:/Windows/Fonts/NanumSquareB.ttf",
+            "C:/Windows/Fonts/NanumSquareR.ttf",
+            os.path.join(self.assets_dir, "fonts", "NanumSquareB.ttf"),
             "C:/Windows/Fonts/malgunbd.ttf" if bold else "C:/Windows/Fonts/malgun.ttf",
-            "C:/Windows/Fonts/NanumGothicBold.ttf" if bold else "C:/Windows/Fonts/NanumGothic.ttf",
-            "C:/Windows/Fonts/gulim.ttc",
         ]
 
         for font_path in font_candidates:

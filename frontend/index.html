@@ -3,341 +3,211 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AutoTube - AI 유튜브 영상 자동 생성</title>
-    <meta name="description" content="링크 하나로 유튜브 영상을 자동 생성하는 AI 파이프라인">
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Noto+Sans+KR:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <title>AutoTube</title>
+    <!-- Google Identity Services -->
+    <script src="https://accounts.google.com/gsi/client" async defer></script>
     <link rel="stylesheet" href="/style.css">
 </head>
 <body>
-    <!-- ═══ 배경 애니메이션 ═══ -->
-    <div class="bg-animation">
-        <div class="bg-orb bg-orb-1"></div>
-        <div class="bg-orb bg-orb-2"></div>
-        <div class="bg-orb bg-orb-3"></div>
-    </div>
-
-    <!-- ═══ 헤더 ═══ -->
+    <!-- Header -->
     <header class="header">
-        <div class="credit-display" id="creditDisplay">
-            💎 잔여 크레딧: <span class="credit-val" id="creditValue">...</span>
-        </div>
-        <div class="header-inner">
+        <div class="container header-inner">
             <div class="logo">
-                <span class="logo-icon">▶</span>
-                <span class="logo-text">Auto<span class="logo-accent">Tube</span></span>
+                <span>AutoTube</span>
             </div>
-            <p class="header-tagline">AI가 만드는 유튜브 영상 · 링크 하나면 끝</p>
+            
+            <div class="nav-actions hidden" id="authNav">
+                <button class="button-ghost" onclick="showInputSection()">새 영상</button>
+                <button class="button-ghost" onclick="showHistorySection()">마이페이지</button>
+                
+                <div class="user-profile">
+                    <img id="userAvatar" class="user-avatar" src="" alt="User" style="display:none;">
+                    <span id="userName" class="body-sm-bold"></span>
+                    <button class="button-secondary" onclick="logout()" style="padding: 8px 16px; margin-left: 8px;">로그아웃</button>
+                </div>
+            </div>
         </div>
     </header>
 
-    <!-- ═══ 메인 컨텐츠 ═══ -->
-    <main class="main-container">
-
-        <!-- 입력 섹션 -->
-        <section class="input-section" id="inputSection">
-            <div class="input-card glass-card">
-                <h1 class="input-title">
-                    <span class="emoji-icon">🎬</span>
-                    기사 링크만 넣으면, AI가 영상을 만들어드립니다
-                </h1>
-                <p class="input-desc">뉴스, 블로그, 기사 URL을 입력하면 제목, 썸네일, 나레이션, 자막, 영상까지 전자동으로 생성합니다.</p>
-
-                <div class="url-input-wrapper">
-                    <div class="url-input-icon">🔗</div>
-                    <input
-                        type="url"
-                        id="urlInput"
-                        class="url-input"
-                        placeholder="https://news.example.com/article/12345"
-                        autocomplete="off"
-                    >
-                    <button id="generateBtn" class="generate-btn" onclick="startGeneration()">
-                        <span class="btn-icon">⚡</span>
-                        <span class="btn-text">생성 시작</span>
-                    </button>
+    <main class="container">
+        <!-- Auth Section -->
+        <section id="loginSection" class="auth-container">
+            <div class="auth-card card-checkout-summary">
+                <h2 class="heading-sm" style="margin-bottom: var(--spacing-sm);">로그인</h2>
+                <p class="body-sm text-muted" style="margin-bottom: var(--spacing-lg);">AutoTube 서비스를 시작하세요.</p>
+                
+                <!-- Google Login Button (Custom or GIS) -->
+                <div id="g_id_onload"
+                     data-client_id="YOUR_GOOGLE_CLIENT_ID_HERE.apps.googleusercontent.com"
+                     data-context="signin"
+                     data-ux_mode="popup"
+                     data-callback="handleGoogleLogin"
+                     data-auto_prompt="false">
                 </div>
+                <div class="g_id_signin" data-type="standard" data-shape="pill" data-theme="outline" data-text="signin_with" data-size="large" data-logo_alignment="left" style="display:flex; justify-content:center; margin-bottom:16px;"></div>
 
-                <!-- 옵션 토글 -->
-                <div class="options-toggle" onclick="toggleOptions()">
-                    <span>⚙️ 고급 설정</span>
-                    <span class="toggle-arrow" id="toggleArrow">▼</span>
-                </div>
+                <div class="divider">또는</div>
 
-                <div class="options-panel" id="optionsPanel">
-                    <div class="options-grid">
-                        <div class="option-group">
-                            <label>AI 모델</label>
-                            <select id="optModel">
-                                <option value="gemini-2.5-flash">Gemini 2.5 Flash (빠름)</option>
-                                <option value="gemini-2.5-pro">Gemini 2.5 Pro (고품질)</option>
+                <input type="text" id="loginId" class="text-input" placeholder="이메일" style="margin-bottom: var(--spacing-sm);">
+                <input type="password" id="loginPw" class="text-input" placeholder="비밀번호" style="margin-bottom: var(--spacing-lg);" onkeydown="if(event.key==='Enter') login()">
+                
+                <button class="button-primary" style="width: 100%; margin-bottom: var(--spacing-sm);" onclick="login()">이메일로 로그인</button>
+                <button class="button-ghost" style="width: 100%;" onclick="register()">새 계정 만들기</button>
+            </div>
+        </section>
+
+        <!-- Main Input Section -->
+        <section id="inputSection" class="hero-section hidden">
+            <h1 class="hero-display">기사 링크 하나로<br>유튜브 영상을 만드세요.</h1>
+            <p class="subtitle-md" style="color: var(--colors-slate); margin-top: var(--spacing-md);">제목, 썸네일, 자막까지 AI가 모두 준비합니다.</p>
+            
+            <div class="url-input-container">
+                <input type="url" id="urlInput" class="text-input" placeholder="https://news.example.com/article" style="height: 56px; font-size: 18px;">
+                <button id="prepareBtn" class="button-buy-cta" style="height: 56px; font-size: 16px;" onclick="startPrepare()">대본 및 프롬프트 추출하기</button>
+                
+                <div class="options-panel" style="margin-top: var(--spacing-lg);">
+                    <div style="cursor: pointer; display: flex; justify-content: space-between; align-items: center;" onclick="document.getElementById('optGrid').classList.toggle('hidden')">
+                        <span class="body-md-bold">고급 설정</span>
+                        <span>▼</span>
+                    </div>
+                    <div id="optGrid" class="options-grid hidden">
+                        <div>
+                            <label class="input-label">AI 모델</label>
+                            <select id="optModel" class="text-input">
+                                <option value="gemini-2.5-flash">Gemini 2.5 Flash</option>
+                                <option value="gemini-2.5-pro">Gemini 2.5 Pro</option>
                             </select>
                         </div>
-                        <div class="option-group">
-                            <label>🎙️ TTS 음성</label>
-                            <select id="optVoice">
+                        <div>
+                            <label class="input-label">TTS 음성</label>
+                            <select id="optVoice" class="text-input">
                                 <option value="Kore" selected>Kore (한국어 기본)</option>
-                                <option value="Aoede">Aoede (밝은 톤)</option>
-                                <option value="Charon">Charon (차분한 톤)</option>
-                                <option value="Fenrir">Fenrir (깊은 톤)</option>
-                                <option value="Puck">Puck (에너지 톤)</option>
+                                <option value="Aoede">Aoede</option>
                             </select>
                         </div>
-                        <div class="option-group">
-                            <label>언어</label>
-                            <select id="optLanguage">
-                                <option value="ko">한국어</option>
-                                <option value="en">English</option>
-                                <option value="ja">日本語</option>
-                            </select>
+                        <div style="grid-column: 1 / -1;">
+                            <label class="input-label">참고 URL</label>
+                            <input type="url" id="optRefUrl" class="text-input" placeholder="스타일 참고용 URL">
                         </div>
-                        <div class="option-group">
-                            <label>해상도</label>
-                            <select id="optResolution">
-                                <option value="1920x1080" selected>1080p (Full HD)</option>
-                                <option value="1280x720">720p (HD)</option>
-                            </select>
-                        </div>
-                    </div>
-                    <div class="flow-toggle-wrapper">
-                        <label class="flow-toggle">
-                            <input type="checkbox" id="optFlow">
-                            <span class="flow-toggle-slider"></span>
-                            <span class="flow-toggle-label">🎬 Flow/Veo 영상 클립 생성 (울트라 크레딧 사용)</span>
-                        </label>
-                        <select id="optVeoQuality" class="veo-quality-select" disabled>
-                            <option value="fast">Fast (~20 크레딧/클립)</option>
-                            <option value="quality">Quality (~100 크레딧/클립)</option>
-                        </select>
                     </div>
                 </div>
             </div>
         </section>
 
-        <!-- 진행 상황 섹션 -->
-        <section class="progress-section hidden" id="progressSection">
-            <div class="progress-card glass-card">
-                <h2 class="progress-title">
-                    <span class="spinner"></span>
-                    AI가 영상을 제작하고 있습니다
-                </h2>
-                <p class="progress-subtitle" id="progressMessage">파이프라인을 초기화하는 중...</p>
+        <!-- Upload Scenes Section -->
+        <section id="uploadSection" class="hidden" style="margin-top: var(--spacing-section);">
+            <div class="card-product-feature">
+                <h2 class="heading-sm">2단계: 영상 클립 업로드</h2>
+                <p class="body-md" style="margin-top: var(--spacing-xs);">프롬프트를 복사하여 Flow에서 배경 영상을 1개만 생성한 뒤 업로드해주세요. 영상은 나레이션 길이에 맞춰 자동으로 반복(Loop) 재생됩니다.</p>
+                
+                <div id="scenesContainer" class="scenes-grid"></div>
+                
+                <div style="margin-top: var(--spacing-xl); text-align: center;">
+                    <button id="assembleBtn" class="button-buy-cta" onclick="startAssemble()">최종 조립 및 영상 렌더링</button>
+                </div>
+            </div>
+        </section>
 
-                <!-- 파이프라인 단계 -->
+        <!-- Progress Section -->
+        <section id="progressSection" class="hidden" style="margin-top: var(--spacing-section);">
+            <div class="card-checkout-summary" style="max-width: 600px; margin: 0 auto; text-align: center;">
+                <h2 class="heading-sm">영상을 제작하고 있습니다</h2>
+                <p id="progressMessage" class="body-sm" style="color: var(--colors-slate); margin: var(--spacing-sm) 0 var(--spacing-xl);">초기화 중...</p>
+                
                 <div class="pipeline-steps">
-                    <div class="pipeline-step" id="step-article_extraction" data-step="article_extraction">
-                        <div class="step-indicator">
-                            <div class="step-dot"></div>
-                            <div class="step-line"></div>
-                        </div>
-                        <div class="step-content">
-                            <div class="step-icon">📰</div>
-                            <div class="step-info">
-                                <h3>기사 추출</h3>
-                                <p>URL에서 제목, 본문, 이미지를 추출합니다</p>
-                            </div>
-                        </div>
+                    <div class="pipeline-step" id="step-article_extraction">
+                        <div class="step-circle">1</div>
+                        <span class="body-md-bold">기사 분석 및 대본 작성</span>
                     </div>
-
-                    <div class="pipeline-step" id="step-script_generation" data-step="script_generation">
-                        <div class="step-indicator">
-                            <div class="step-dot"></div>
-                            <div class="step-line"></div>
-                        </div>
-                        <div class="step-content">
-                            <div class="step-icon">🤖</div>
-                            <div class="step-info">
-                                <h3>대본 & 기획</h3>
-                                <p>AI가 제목, 해시태그, 나레이션 대본을 작성합니다</p>
-                            </div>
-                        </div>
+                    <div class="pipeline-step" id="step-tts_narration">
+                        <div class="step-circle">2</div>
+                        <span class="body-md-bold">음성 및 자막 생성</span>
                     </div>
-
-                    <div class="pipeline-step" id="step-tts_narration" data-step="tts_narration">
-                        <div class="step-indicator">
-                            <div class="step-dot"></div>
-                            <div class="step-line"></div>
-                        </div>
-                        <div class="step-content">
-                            <div class="step-icon">🎙️</div>
-                            <div class="step-info">
-                                <h3>나레이션 생성</h3>
-                                <p>대본을 자연스러운 음성으로 변환합니다</p>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="pipeline-step" id="step-image_generation" data-step="image_generation">
-                        <div class="step-indicator">
-                            <div class="step-dot"></div>
-                            <div class="step-line"></div>
-                        </div>
-                        <div class="step-content">
-                            <div class="step-icon">🖼️</div>
-                            <div class="step-info">
-                                <h3>AI 이미지 생성</h3>
-                                <p>Imagen AI로 장면별 배경 이미지를 생성합니다</p>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="pipeline-step" id="step-thumbnail_creation" data-step="thumbnail_creation">
-                        <div class="step-indicator">
-                            <div class="step-dot"></div>
-                            <div class="step-line"></div>
-                        </div>
-                        <div class="step-content">
-                            <div class="step-icon">🎨</div>
-                            <div class="step-info">
-                                <h3>썸네일 제작</h3>
-                                <p>클릭을 유도하는 유튜브 썸네일을 디자인합니다</p>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="pipeline-step" id="step-subtitle_generation" data-step="subtitle_generation">
-                        <div class="step-indicator">
-                            <div class="step-dot"></div>
-                            <div class="step-line"></div>
-                        </div>
-                        <div class="step-content">
-                            <div class="step-icon">📝</div>
-                            <div class="step-info">
-                                <h3>자막 생성</h3>
-                                <p>나레이션에 맞춘 SRT 자막을 자동 생성합니다</p>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="pipeline-step" id="step-video_assembly" data-step="video_assembly">
-                        <div class="step-indicator">
-                            <div class="step-dot"></div>
-                        </div>
-                        <div class="step-content">
-                            <div class="step-icon">🎬</div>
-                            <div class="step-info">
-                                <h3>영상 렌더링</h3>
-                                <p>모든 소스를 결합하여 최종 영상을 만듭니다</p>
-                            </div>
-                        </div>
+                    <div class="pipeline-step" id="step-video_assembly">
+                        <div class="step-circle">3</div>
+                        <span class="body-md-bold">최종 영상 조립</span>
                     </div>
                 </div>
             </div>
         </section>
 
-        <!-- 결과 섹션 -->
-        <section class="result-section hidden" id="resultSection">
-            <div class="result-card glass-card">
-                <div class="result-header">
-                    <h2 class="result-title">🎉 영상이 완성되었습니다!</h2>
-                    <p class="result-time" id="resultTime"></p>
-                </div>
-
-                <!-- 영상 프리뷰 -->
-                <div class="video-preview">
+        <!-- Result Section -->
+        <section id="resultSection" class="hidden" style="margin-top: var(--spacing-section);">
+            <div class="result-layout">
+                <!-- Video Left -->
+                <div class="video-container card-product-feature" style="padding: 0; background: #000;">
                     <video id="videoPlayer" controls></video>
                 </div>
-
-                <!-- 메타데이터 카드들 -->
-                <div class="metadata-grid">
-                    <!-- 썸네일 -->
-                    <div class="meta-card">
-                        <h3>🖼️ 썸네일</h3>
-                        <div class="thumbnail-preview">
-                            <img id="thumbnailImg" alt="생성된 썸네일">
+                
+                <!-- Info Right -->
+                <div class="card-checkout-summary">
+                    <h2 class="heading-sm">제작 완료!</h2>
+                    <p id="resultTime" class="body-sm" style="color: var(--colors-slate); margin-bottom: var(--spacing-lg);"></p>
+                    
+                    <div class="meta-grid">
+                        <div class="meta-item">
+                            <h3 class="body-sm-bold" style="color: var(--colors-steel);">유튜브 제목</h3>
+                            <p id="ytTitle" class="body-md" style="margin-top: 4px;"></p>
+                        </div>
+                        <div class="meta-item">
+                            <h3 class="body-sm-bold" style="color: var(--colors-steel);">유튜브 설명</h3>
+                            <p id="ytDescription" class="body-sm" style="margin-top: 4px; white-space: pre-wrap;"></p>
+                        </div>
+                        <div class="meta-item">
+                            <h3 class="body-sm-bold" style="color: var(--colors-steel);">해시태그 & 태그</h3>
+                            <p id="ytHashtags" class="body-sm" style="margin-top: 4px; color: var(--colors-primary);"></p>
                         </div>
                     </div>
-
-                    <!-- 유튜브 제목 -->
-                    <div class="meta-card">
-                        <h3>📌 유튜브 제목</h3>
-                        <p class="meta-value copyable" id="ytTitle" onclick="copyText(this)"></p>
-                    </div>
-
-                    <!-- 설명 -->
-                    <div class="meta-card meta-card-wide">
-                        <h3>📋 유튜브 설명</h3>
-                        <p class="meta-value copyable" id="ytDescription" onclick="copyText(this)"></p>
-                    </div>
-
-                    <!-- 해시태그 -->
-                    <div class="meta-card">
-                        <h3>#️⃣ 해시태그</h3>
-                        <div class="hashtags-list" id="ytHashtags"></div>
-                    </div>
-
-                    <!-- 태그 -->
-                    <div class="meta-card">
-                        <h3>🏷️ SEO 태그</h3>
-                        <div class="tags-list" id="ytTags"></div>
+                    
+                    <div style="margin-top: var(--spacing-xl); display: flex; flex-direction: column; gap: var(--spacing-sm);">
+                        <button class="button-buy-cta" onclick="showUploadPreview()" style="width: 100%;">YouTube 바로 업로드</button>
+                        <a id="downloadVideo" class="button-secondary" style="width: 100%; text-align: center;" download>영상 다운로드</a>
+                        <button class="button-ghost" onclick="resetUI()" style="width: 100%;">새 영상 만들기</button>
                     </div>
                 </div>
-
-                <!-- 다운로드 버튼들 -->
-                <div class="download-actions">
-                    <a id="downloadVideo" class="download-btn download-primary" download>
-                        <span>📥</span> 영상 다운로드 (.mp4)
-                    </a>
-                    <a id="downloadThumb" class="download-btn" download>
-                        <span>🖼️</span> 썸네일 다운로드
-                    </a>
-                    <a id="downloadSrt" class="download-btn" download>
-                        <span>📝</span> 자막 다운로드 (.srt)
-                    </a>
-                    <button class="download-btn" onclick="copyAllMeta()">
-                        <span>📋</span> 메타데이터 복사
-                    </button>
-                    <button class="download-btn download-youtube" id="uploadYtBtn" onclick="showUploadPreview()">
-                        <span>📤</span> YouTube 업로드
-                    </button>
-                </div>
-
-                <!-- 새로 만들기 -->
-                <button class="new-btn" onclick="resetUI()">
-                    ✨ 새 영상 만들기
-                </button>
             </div>
         </section>
 
-        <!-- 에러 섹션 -->
-        <section class="error-section hidden" id="errorSection">
-            <div class="error-card glass-card">
-                <h2>❌ 오류가 발생했습니다</h2>
-                <p class="error-message" id="errorMessage"></p>
-                <button class="new-btn" onclick="resetUI()">다시 시도</button>
+        <!-- My Page (History) -->
+        <section id="historySection" class="hidden" style="margin-top: var(--spacing-section);">
+            <div class="card-product-feature">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: var(--spacing-lg);">
+                    <h2 class="heading-sm">마이페이지</h2>
+                    <button class="button-ghost" onclick="fetchHistory()">새로고침</button>
+                </div>
+                
+                <div id="historyList" class="history-grid">
+                    <!-- History items injected via JS -->
+                </div>
             </div>
         </section>
-
+        
+        <!-- Error -->
+        <section id="errorSection" class="hidden" style="margin-top: var(--spacing-section); text-align: center;">
+            <div class="card-checkout-summary" style="max-width: 500px; margin: 0 auto; border-color: var(--colors-critical-strong);">
+                <h2 class="heading-sm" style="color: var(--colors-critical-strong);">오류 발생</h2>
+                <p id="errorMessage" class="body-md" style="margin: var(--spacing-md) 0;"></p>
+                <button class="button-secondary" onclick="resetUI()">처음으로 돌아가기</button>
+            </div>
+        </section>
     </main>
-
-    <!-- ═══ 푸터 ═══ -->
-    <footer class="footer">
-        <p>AutoTube v2.0 Ultra · Powered by Gemini AI + Imagen + Flow</p>
-    </footer>
-
-    <!-- 토스트 알림 -->
-    <div class="toast hidden" id="toast"></div>
-
-    <!-- YouTube 업로드 확인 모달 -->
-    <div class="modal-overlay" id="uploadModal">
-        <div class="modal-card">
-            <h3 class="modal-title">📤 YouTube 업로드 확인</h3>
-            <div class="modal-content">
-                <p style="margin-bottom: 8px;">다음 정보로 영상을 업로드합니다.</p>
-                <div style="margin-bottom: 8px;"><strong>제목:</strong> <span id="modalTitle"></span></div>
-                <div style="margin-bottom: 12px;"><strong>공개 설정:</strong> 
-                    <select id="modalPrivacy" style="background: rgba(255,255,255,0.1); border: 1px solid var(--border-color); color: white; padding: 4px; border-radius: 4px;">
-                        <option value="private">비공개 (Private)</option>
-                        <option value="unlisted">일부 공개 (Unlisted)</option>
-                        <option value="public">공개 (Public)</option>
-                    </select>
-                </div>
-                <p style="font-size: 12px; opacity: 0.8;">※ 제목과 설명, 썸네일이 준비된 상태입니다. 승인하시면 백그라운드에서 업로드가 시작됩니다.</p>
+    
+    <!-- Upload Modal -->
+    <div id="uploadModal" class="hidden" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 1000; display: flex; align-items: center; justify-content: center;">
+        <div class="card-checkout-summary" style="width: 400px;">
+            <h3 class="heading-sm" style="margin-bottom: var(--spacing-md);">YouTube 업로드</h3>
+            <p class="body-sm" style="margin-bottom: var(--spacing-sm);"><strong>제목:</strong> <span id="modalTitle"></span></p>
+            <div style="margin-bottom: var(--spacing-lg);">
+                <label class="body-sm-bold" style="display: block; margin-bottom: 4px;">공개 설정:</label>
+                <select id="modalPrivacy" class="text-input" style="height: 36px; padding: 4px 12px;">
+                    <option value="private">비공개</option>
+                    <option value="unlisted">일부 공개</option>
+                    <option value="public">공개</option>
+                </select>
             </div>
-            <div class="modal-actions">
-                <button class="modal-btn" onclick="closeUploadPreview()">취소</button>
-                <button class="modal-btn modal-btn-primary" onclick="confirmUploadToYoutube()">승인 및 업로드</button>
+            <div style="display: flex; justify-content: flex-end; gap: var(--spacing-sm);">
+                <button class="button-ghost" onclick="closeUploadPreview()">취소</button>
+                <button class="button-primary" onclick="confirmUploadToYoutube()">승인 및 업로드</button>
             </div>
         </div>
     </div>
