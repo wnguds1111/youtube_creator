@@ -11,3 +11,6 @@ google-auth-oauthlib
 requests
 beautifulsoup4
 python-multipart
+newspaper3k
+pydub
+lxml[html_clean]
