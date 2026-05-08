@@ -4,7 +4,6 @@ AutoTube - Article Scraper
 """
 
 import requests
-from newspaper import Article
 from bs4 import BeautifulSoup
 from urllib.parse import urljoin, urlparse
 import re
@@ -26,7 +25,7 @@ class ArticleScraper:
 
     def extract(self, url: str) -> dict:
         """
-        URL에서 기사 콘텐츠를 추출합니다.
+        URL에서 기사 콘텐츠를 추출합니다 (BeautifulSoup 방식).
 
         Returns:
             dict: {
@@ -45,49 +44,51 @@ class ArticleScraper:
         logger.info(f"🔍 기사 추출 시작: {url}")
 
         try:
-            # newspaper3k로 기사 파싱
-            article = Article(url, language=self.language)
-            article.download()
-            article.parse()
+            resp = requests.get(url, headers=self.HEADERS, timeout=15)
+            resp.raise_for_status()
+            soup = BeautifulSoup(resp.text, "lxml")
 
-            try:
-                article.nlp()
-            except Exception:
-                pass
+            # 제목 추출
+            title = ""
+            for tag in [soup.find("h1"), soup.find("title")]:
+                if tag:
+                    title = tag.get_text(strip=True)
+                    break
 
-            # 추가 이미지 수집 (newspaper3k가 놓칠 수 있는 이미지)
-            extra_images = self._extract_extra_images(url)
+            # 본문 추출 (article 태그 우선, 없으면 큰 p 태그들)
+            text = ""
+            article_tag = soup.find("article")
+            if article_tag:
+                paragraphs = article_tag.find_all("p")
+            else:
+                paragraphs = soup.find_all("p")
 
-            # 모든 이미지 통합 (중복 제거)
-            all_images = list(dict.fromkeys(
-                [img for img in [article.top_image] + list(article.images) + extra_images
-                 if img and self._is_valid_image(img)]
-            ))
+            text = "\n\n".join(p.get_text(strip=True) for p in paragraphs if len(p.get_text(strip=True)) > 20)
 
-            # 소스명 추출
+            # 이미지 추출
+            images = self._extract_extra_images(url, soup=soup)
+
             parsed = urlparse(url)
             source_name = parsed.netloc.replace("www.", "")
 
             result = {
                 "url": url,
-                "title": article.title or "제목 없음",
-                "text": article.text or "",
-                "summary": article.summary if hasattr(article, 'summary') and article.summary else "",
-                "authors": article.authors or [],
-                "publish_date": str(article.publish_date) if article.publish_date else None,
-                "top_image": article.top_image,
-                "images": all_images[:10],  # 최대 10개
-                "keywords": article.keywords if hasattr(article, 'keywords') else [],
+                "title": title or "제목 없음",
+                "text": text,
+                "summary": text[:300] if text else "",
+                "authors": [],
+                "publish_date": None,
+                "top_image": images[0] if images else None,
+                "images": images[:10],
+                "keywords": [],
                 "source_name": source_name,
             }
-
             logger.info(f"✅ 기사 추출 완료: '{result['title']}' (이미지 {len(result['images'])}개)")
             return result
-
+            
         except Exception as e:
             logger.error(f"❌ 기사 추출 실패: {e}")
-            # 폴백: requests + BeautifulSoup으로 시도
-            return self._fallback_extract(url)
+            raise ValueError(f"기사를 추출할 수 없습니다: {url}")
 
     def _fallback_extract(self, url: str) -> dict:
         """newspaper3k 실패 시 BeautifulSoup으로 폴백"""
