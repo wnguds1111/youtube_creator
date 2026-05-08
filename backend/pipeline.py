@@ -117,7 +117,8 @@ class Pipeline:
 
             # ═══ STEP 4: 자막 생성 ═══
             update("subtitle_generation", 0, "SRT 자막을 생성하는 중...")
-            subtitle_path = self.subtitle.generate(tts_result["scene_audios"], project_dir)
+            srt_path = os.path.join(project_dir, "subtitles.srt")
+            subtitle_path = self.subtitle.generate_srt(tts_result["scene_audios"], srt_path)
             result["steps_completed"].append("subtitle_generation")
             update("subtitle_generation", 100, "자막 생성 완료")
 
