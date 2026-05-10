@@ -86,6 +86,10 @@
                             </select>
                         </div>
                         <div style="grid-column: 1 / -1;">
+                            <label class="input-label">Gemini API 키 (선택사항 - 미입력시 서버 환경변수 사용)</label>
+                            <input type="password" id="optApiKey" class="text-input" placeholder="AI Studio API Key">
+                        </div>
+                        <div style="grid-column: 1 / -1;">
                             <label class="input-label">참고 URL</label>
                             <input type="url" id="optRefUrl" class="text-input" placeholder="스타일 참고용 URL">
                         </div>
@@ -96,10 +100,25 @@
 
         <!-- Upload Scenes Section -->
         <section id="uploadSection" class="hidden" style="margin-top: var(--spacing-section);">
-            <div class="card-product-feature">
+                <div class="card-product-feature">
                 <h2 class="heading-sm">2단계: 영상 클립 업로드</h2>
                 <p class="body-md" style="margin-top: var(--spacing-xs);">프롬프트를 복사하여 Flow에서 배경 영상을 1개만 생성한 뒤 업로드해주세요. 영상은 나레이션 길이에 맞춰 자동으로 반복(Loop) 재생됩니다.</p>
                 
+                <!-- YouTube Metadata Preview -->
+                <div class="card-checkout-summary" style="margin: var(--spacing-lg) 0; background-color: var(--colors-slate-dark); border: 1px solid var(--colors-steel);">
+                    <h3 class="body-sm-bold" style="color: var(--colors-primary);">생성된 유튜브 정보 미리보기</h3>
+                    <div style="margin-top: var(--spacing-sm);">
+                        <p class="body-sm-bold" style="color: var(--colors-steel);">제목</p>
+                        <p id="previewTitle" class="body-md" style="margin-bottom: var(--spacing-sm);"></p>
+                        
+                        <p class="body-sm-bold" style="color: var(--colors-steel);">설명</p>
+                        <p id="previewDescription" class="body-sm" style="margin-bottom: var(--spacing-sm); white-space: pre-wrap; color: var(--colors-slate);"></p>
+                        
+                        <p class="body-sm-bold" style="color: var(--colors-steel);">해시태그</p>
+                        <p id="previewHashtags" class="body-sm" style="color: var(--colors-primary);"></p>
+                    </div>
+                </div>
+
                 <div id="scenesContainer" class="scenes-grid"></div>
                 
                 <div style="margin-top: var(--spacing-xl); text-align: center;">

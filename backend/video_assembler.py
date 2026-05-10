@@ -174,7 +174,8 @@ class VideoAssembler:
                                 # 2. 남은 시간이 있다면 다시 AI 영상을 루프 (트랜지션 느낌)
                                 if remaining > 0:
                                     vid_dur = min(4.0, remaining)
-                                    clips.append(main_clip.loop(duration=vid_dur))
+                                    import moviepy.video.fx as vfx
+                                    clips.append(main_clip.with_effects([vfx.Loop(duration=vid_dur)]))
                                     current_time += vid_dur
                             
                             from moviepy import concatenate_videoclips
@@ -184,7 +185,8 @@ class VideoAssembler:
                             
                         # 믹스 모드가 아니라면 기존대로 무한 루프
                         if main_clip.duration < duration:
-                            main_clip = main_clip.loop(duration=duration)
+                            import moviepy.video.fx as vfx
+                            main_clip = main_clip.with_effects([vfx.Loop(duration=duration)])
                         else:
                             main_clip = main_clip.subclipped(0, duration)
                         logger.info(f"  🎬 장면 {scene_num}: 단일 영상 반복(Loop) 사용")
@@ -261,7 +263,8 @@ class VideoAssembler:
         text_h = bbox[3] - bbox[1]
 
         x = (self.width - text_w) // 2
-        y = self.height - text_h - (150 if self.width < self.height else 80)
+        # 자막을 화면 중앙보다 살짝 아래로 (원래 하단에 있던 것을 위로 올림)
+        y = (self.height - text_h) // 2 + (100 if self.width < self.height else 50)
 
         # 프리미엄 텍스트 스타일링 (외곽선 + 그림자)
         shadow_offset = 4

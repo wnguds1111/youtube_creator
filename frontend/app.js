@@ -248,6 +248,7 @@ async function startPrepare() {
         video_width: 1080,
         video_height: 1920,
         target_duration: 50,
+        gemini_api_key: document.getElementById('optApiKey').value.trim() || undefined
     };
 
     try {
@@ -288,6 +289,11 @@ function showUploadUI(content) {
         container.innerHTML = '<p class="body-md">생성된 장면이 없습니다.</p>';
         return;
     }
+    
+    // 유튜브 정보 미리보기 세팅
+    document.getElementById('previewTitle').textContent = content.youtube_title || '제목 없음';
+    document.getElementById('previewDescription').textContent = content.youtube_description || '설명 없음';
+    document.getElementById('previewHashtags').textContent = (content.hashtags || []).join(' ') + ' ' + (content.tags || []).join(' ');
     
     content.scenes.forEach((scene, index) => {
         const div = document.createElement('div');

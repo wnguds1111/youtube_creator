@@ -80,6 +80,7 @@ class PrepareRequest(BaseModel):
     video_width: int = 1080
     video_height: int = 1920
     target_duration: int = 50
+    gemini_api_key: Optional[str] = None
 
 class JobStatus(BaseModel):
     job_id: str
@@ -180,9 +181,9 @@ async def auth_logout(authorization: str = Header(None)):
 @app.post("/api/prepare")
 async def prepare_video(request: PrepareRequest, username: str = Depends(get_current_user)):
     """1단계: 기사 추출 및 대본, 프롬프트 생성"""
-    gemini_key = os.getenv("GEMINI_API_KEY")
+    gemini_key = request.gemini_api_key or os.getenv("GEMINI_API_KEY")
     if not gemini_key or gemini_key == "your_gemini_api_key_here":
-        raise HTTPException(status_code=400, detail="GEMINI_API_KEY가 설정되지 않았습니다. .env 파일을 확인하세요.")
+        raise HTTPException(status_code=400, detail="GEMINI_API_KEY가 설정되지 않았습니다. API 키를 입력하거나 .env 파일을 확인하세요.")
 
     config = {
         "gemini_api_key": gemini_key,
@@ -249,7 +250,8 @@ async def assemble_video(
         saved_paths.append(file_path)
 
     # 파이프라인 초기화
-    config["gemini_api_key"] = os.getenv("GEMINI_API_KEY")
+    if not config.get("gemini_api_key"):
+        config["gemini_api_key"] = os.getenv("GEMINI_API_KEY")
     pipeline = Pipeline(config)
     
     active_jobs[job_id] = {
