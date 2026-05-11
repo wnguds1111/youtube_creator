@@ -12,6 +12,7 @@ let ws = null;
 let pollInterval = null;
 const TOKEN_KEY = 'autotube_token';
 let currentUser = null;
+let currentContentData = null;
 
 // ═══════════════════════════════════════
 // Auth & History (마이페이지)
@@ -247,7 +248,7 @@ async function startPrepare() {
         tts_speed: 1.0,
         video_width: 1080,
         video_height: 1920,
-        target_duration: 50,
+        target_duration: 30,
         gemini_api_key: document.getElementById('optApiKey').value.trim() || undefined
     };
 
@@ -268,6 +269,7 @@ async function startPrepare() {
 
         const data = await resp.json();
         currentJobId = data.project_id;
+        currentContentData = data.content;
         showUploadUI(data.content);
 
     } catch (err) {
@@ -428,13 +430,24 @@ function updateProgress(data) {
     if (message) document.getElementById('progressMessage').textContent = message;
 
     const allSteps = ['article_extraction', 'tts_narration', 'video_assembly'];
+    let completedCount = 0;
     allSteps.forEach(s => {
         const el = document.getElementById(`step-${s}`);
         if (!el) return;
         el.classList.remove('active', 'completed');
-        if (steps_completed && steps_completed.includes(s)) el.classList.add('completed');
-        else if (s === step) el.classList.add('active');
+        if (steps_completed && steps_completed.includes(s)) {
+            el.classList.add('completed');
+            completedCount++;
+        }
+        else if (s === step) {
+            el.classList.add('active');
+            completedCount += 0.5;
+        }
     });
+    
+    const percentage = Math.min(100, Math.floor((completedCount / allSteps.length) * 100));
+    const pctEl = document.getElementById('progressPercent');
+    if (pctEl) pctEl.textContent = `${percentage}%`;
 }
 
 function showResult(result) {
@@ -443,7 +456,7 @@ function showResult(result) {
 
     const projectId = result.project_id;
     currentJobId = projectId;
-    const metadata = result.metadata || {};
+    const metadata = result.metadata || currentContentData || {};
 
     const videoPlayer = document.getElementById('videoPlayer');
     if (result.video_path) videoPlayer.src = `/output/${projectId}/final_video.mp4`;

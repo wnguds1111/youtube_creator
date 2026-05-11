@@ -67,7 +67,21 @@ class VideoAssembler:
                 )
 
                 # 자막 오버레이
-                if narration:
+                subs = self._parse_srt(subtitle_path) if subtitle_path else []
+                if subs:
+                    sub_clips = []
+                    for start, end, text in subs:
+                        if start >= duration: continue
+                        if end > duration: end = duration
+                        sub_dur = end - start
+                        sub_img = self._create_subtitle_frame(text)
+                        sc = ImageClip(sub_img, duration=sub_dur).set_start(start)
+                        sub_clips.append(sc)
+                    if sub_clips:
+                        scene_clip = CompositeVideoClip([bg_clip] + sub_clips)
+                    else:
+                        scene_clip = bg_clip
+                elif narration:
                     subtitle_frame = self._create_subtitle_frame(narration)
                     subtitle_clip = ImageClip(subtitle_frame, duration=duration)
                     scene_clip = CompositeVideoClip([bg_clip, subtitle_clip])
@@ -274,6 +288,33 @@ class VideoAssembler:
 
         return np.array(overlay)
 
+    def _parse_srt(self, srt_path: str):
+        """SRT 파일을 파싱하여 (start, end, text) 리스트 반환"""
+        import re
+        subs = []
+        if not srt_path or not os.path.exists(srt_path): return subs
+        try:
+            with open(srt_path, 'r', encoding='utf-8') as f:
+                content = f.read()
+            blocks = content.strip().split('\n\n')
+            for block in blocks:
+                lines = block.split('\n')
+                if len(lines) >= 3:
+                    times = lines[1].split(' --> ')
+                    if len(times) == 2:
+                        def t2s(t):
+                            t = t.replace(',', '.')
+                            h, m, s = t.split(':')
+                            return int(h)*3600 + int(m)*60 + float(s)
+                        start = t2s(times[0])
+                        end = t2s(times[1])
+                        text = '\n'.join(lines[2:])
+                        text = re.sub(r'<[^>]+>', '', text)
+                        subs.append((start, end, text))
+        except Exception as e:
+            logger.error(f"SRT 파싱 실패: {e}")
+        return subs
+
     def _create_intro(self, title: str, duration: float = 3) -> ImageClip:
         """세련되고 프리미엄한 인트로 장면 생성"""
         img = Image.new("RGB", (self.width, self.height), (10, 10, 20))
@@ -309,7 +350,7 @@ class VideoAssembler:
 
         # 3. 'HOT ISSUE' 뱃지 (상단 중앙)
         badge_font = self._get_font(32, bold=True)
-        badge_text = "🔥 HOT ISSUE"
+        badge_text = "HOT ISSUE"
         bbox = draw.textbbox((0, 0), badge_text, font=badge_font)
         bw, bh = bbox[2] - bbox[0], bbox[3] - bbox[1]
         bx, by = (self.width - bw) // 2, self.height // 2 - 180
