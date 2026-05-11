@@ -218,6 +218,7 @@ async def prepare_video(request: PrepareRequest, username: str = Depends(get_cur
 async def assemble_video(
     job_id: str, 
     files: list[UploadFile] = File(...), 
+    image_files: list[UploadFile] = File(default=[]),
     username: str = Depends(get_current_user)
 ):
     """2단계: 업로드된 영상으로 최종 결과물 조립"""
@@ -249,6 +250,17 @@ async def assemble_video(
             f.write(await file.read())
         saved_paths.append(file_path)
 
+    saved_images = []
+    for img in image_files:
+        if not img.filename: continue
+        user_images_dir = os.path.join(project_dir, "user_images")
+        os.makedirs(user_images_dir, exist_ok=True)
+        ext = img.filename.split('.')[-1]
+        img_path = os.path.join(user_images_dir, f"custom_{len(saved_images):02d}.{ext}")
+        with open(img_path, "wb") as f:
+            f.write(await img.read())
+        saved_images.append(img_path)
+
     # 파이프라인 초기화
     if not config.get("gemini_api_key"):
         config["gemini_api_key"] = os.getenv("GEMINI_API_KEY")
@@ -273,7 +285,7 @@ async def assemble_video(
 
         # 백그라운드 스레드로 실행 (루프 블로킹 방지)
         loop = asyncio.get_event_loop()
-        result = await loop.run_in_executor(None, lambda: pipeline.assemble(job_id, saved_paths, callback))
+        result = await loop.run_in_executor(None, lambda: pipeline.assemble(job_id, saved_paths, saved_images, callback))
         active_jobs[job_id].update(result)
 
     asyncio.create_task(_run_assemble())

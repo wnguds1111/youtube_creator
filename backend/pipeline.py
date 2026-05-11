@@ -75,7 +75,7 @@ class Pipeline:
             "content": content
         }
 
-    def assemble(self, project_id: str, uploaded_clips: List[str], callback=None) -> dict:
+    def assemble(self, project_id: str, uploaded_clips: List[str], uploaded_images: List[str] = None, callback=None) -> dict:
         """2단계: 업로드된 영상 기반으로 음성, 자막, 영상 조립 및 유튜브 업로드"""
         start_time = time.time()
         project_dir = os.path.join(self.output_base, project_id)
@@ -106,6 +106,9 @@ class Pipeline:
                     article_images = article.get("images", [])
             except Exception:
                 pass
+                
+            if uploaded_images:
+                article_images = uploaded_images
                 
             # ═══ STEP 3: Gemini TTS 나레이션 ═══
             update("tts_narration", 0, "AI 음성 나레이션을 생성하는 중...")
