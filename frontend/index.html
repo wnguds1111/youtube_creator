@@ -3,9 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AutoTube — AI 유튜브 영상 제작 스튜디오</title>
-    <meta name="description" content="기사 링크 하나로 유튜브 쇼츠 영상을 자동으로 제작합니다. AI 대본, 나레이션, 자막까지.">
-    <!-- Google Identity Services -->
+    <title>AutoTube — AI 유튜브 영상 제작</title>
+    <meta name="description" content="기사 링크 하나로 유튜브 쇼츠 영상을 AI가 자동으로 제작합니다.">
     <script src="https://accounts.google.com/gsi/client" async defer></script>
     <link rel="stylesheet" href="/style.css">
 </head>
@@ -13,66 +12,59 @@
     <!-- Header -->
     <header class="header">
         <div class="container header-inner">
-            <div class="logo">
-                <span>AutoTube</span>
-            </div>
-            
+            <div class="logo">AutoTube</div>
             <div class="nav-actions hidden" id="authNav">
-                <button class="button-ghost" onclick="showInputSection()">✦ 새 영상</button>
+                <button class="button-ghost" onclick="showInputSection()">새 영상</button>
                 <button class="button-ghost" onclick="showHistorySection()">마이페이지</button>
-                
                 <div class="user-profile">
                     <img id="userAvatar" class="user-avatar" src="" alt="User" style="display:none;">
-                    <span id="userName" class="body-sm-bold"></span>
-                    <button class="button-ghost" onclick="logout()" style="padding: 6px 14px; font-size: 12px; margin-left: 4px;">로그아웃</button>
+                    <span id="userName" class="body-sm-bold" style="color: var(--text-secondary);"></span>
+                    <button class="button-ghost" onclick="logout()" style="font-size: 13px; padding: 6px 12px; color: var(--text-secondary);">로그아웃</button>
                 </div>
             </div>
         </div>
     </header>
 
     <main class="container">
-        <!-- Auth Section -->
+        <!-- ─── Login ─── -->
         <section id="loginSection" class="auth-container">
             <div class="auth-card card-checkout-summary">
-                <div style="margin-bottom: var(--spacing-xxl);">
-                    <div class="logo" style="justify-content: center; font-size: 28px; margin-bottom: var(--spacing-sm);">AutoTube</div>
-                    <p class="body-sm" style="color: var(--colors-slate);">AI 유튜브 영상 제작 스튜디오에 오신 것을 환영합니다.</p>
+                <div style="margin-bottom: var(--sp-24);">
+                    <div style="font-size: 28px; font-weight: 800; color: var(--blue); margin-bottom: var(--sp-4);">AutoTube</div>
+                    <p class="body-sm" style="color: var(--text-tertiary);">AI 기반 유튜브 영상 제작 스튜디오</p>
                 </div>
-                
-                <!-- Google Login Button (Custom or GIS) -->
+
                 <div id="g_id_onload"
                      data-client_id="YOUR_GOOGLE_CLIENT_ID_HERE.apps.googleusercontent.com"
                      data-context="signin"
                      data-ux_mode="popup"
                      data-callback="handleGoogleLogin"
-                     data-auto_prompt="false">
-                </div>
-                <div class="g_id_signin" data-type="standard" data-shape="pill" data-theme="filled_black" data-text="signin_with" data-size="large" data-logo_alignment="left" style="display:flex; justify-content:center; margin-bottom:16px;"></div>
+                     data-auto_prompt="false"></div>
+                <div class="g_id_signin" data-type="standard" data-shape="rectangular" data-theme="outline" data-text="signin_with" data-size="large" data-logo_alignment="left" style="display:flex; justify-content:center; margin-bottom: 12px;"></div>
 
                 <div class="divider">또는</div>
 
-                <input type="text" id="loginId" class="text-input" placeholder="이메일" style="margin-bottom: var(--spacing-sm);">
-                <input type="password" id="loginPw" class="text-input" placeholder="비밀번호" style="margin-bottom: var(--spacing-lg);" onkeydown="if(event.key==='Enter') login()">
-                
-                <button class="button-buy-cta" style="width: 100%; margin-bottom: var(--spacing-sm);" onclick="login()">로그인</button>
-                <button class="button-ghost" style="width: 100%;" onclick="register()">새 계정 만들기</button>
+                <input type="text" id="loginId" class="text-input" placeholder="이메일" style="margin-bottom: var(--sp-10);">
+                <input type="password" id="loginPw" class="text-input" placeholder="비밀번호" style="margin-bottom: var(--sp-20);" onkeydown="if(event.key==='Enter') login()">
+
+                <button class="button-buy-cta" style="width: 100%; height: 44px; margin-bottom: var(--sp-10);" onclick="login()">로그인</button>
+                <button class="button-secondary" style="width: 100%; height: 44px;" onclick="register()">새 계정 만들기</button>
             </div>
         </section>
 
-        <!-- Main Input Section -->
+        <!-- ─── Input ─── -->
         <section id="inputSection" class="hero-section hidden">
-            <div class="caption-bold" style="color: var(--colors-primary); margin-bottom: var(--spacing-sm);">AI VIDEO STUDIO</div>
-            <h1 class="hero-display">기사 링크 하나로<br>유튜브 영상을 만드세요.</h1>
-            <p class="subtitle-md" style="color: var(--colors-slate); margin-top: var(--spacing-lg);">AI가 대본, 나레이션, 자막까지 모두 준비합니다.</p>
-            
+            <h1 class="hero-display">기사 링크 하나로<br>유튜브 영상을 만드세요</h1>
+            <p class="subtitle-md" style="color: var(--text-secondary); margin-top: var(--sp-12);">AI가 대본, 나레이션, 자막을 모두 준비합니다.</p>
+
             <div class="url-input-container">
-                <input type="url" id="urlInput" class="text-input" placeholder="https://news.example.com/article" style="height: 52px; font-size: 16px;">
-                <button id="prepareBtn" class="button-buy-cta" style="height: 52px; font-size: 15px;" onclick="startPrepare()">대본 및 프롬프트 추출하기 →</button>
-                
-                <div class="options-panel" style="margin-top: var(--spacing-md);">
+                <input type="url" id="urlInput" class="text-input" placeholder="https://news.example.com/article" style="height: 50px; font-size: 16px;">
+                <button id="prepareBtn" class="button-buy-cta" style="height: 50px; font-size: 15px;" onclick="startPrepare()">대본 및 프롬프트 추출하기</button>
+
+                <div class="options-panel">
                     <div style="cursor: pointer; display: flex; justify-content: space-between; align-items: center;" onclick="document.getElementById('optGrid').classList.toggle('hidden')">
-                        <span class="body-sm-bold" style="color: var(--colors-slate);">⚙ 고급 설정</span>
-                        <span style="color: var(--colors-stone); font-size: 12px;">▼</span>
+                        <span class="body-sm-bold" style="color: var(--text-secondary);">⚙ 고급 설정</span>
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--text-tertiary)" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
                     </div>
                     <div id="optGrid" class="options-grid hidden">
                         <div>
@@ -91,7 +83,7 @@
                         </div>
                         <div style="grid-column: 1 / -1;">
                             <label class="input-label">Gemini API 키 (선택사항)</label>
-                            <input type="password" id="optApiKey" class="text-input" placeholder="미입력시 서버 환경변수 사용">
+                            <input type="password" id="optApiKey" class="text-input" placeholder="미입력 시 서버 환경변수 사용">
                         </div>
                         <div style="grid-column: 1 / -1;">
                             <label class="input-label">참고 URL</label>
@@ -102,56 +94,51 @@
             </div>
         </section>
 
-        <!-- Upload Scenes Section -->
-        <section id="uploadSection" class="hidden" style="margin-top: var(--spacing-section-sm);">
+        <!-- ─── Upload ─── -->
+        <section id="uploadSection" class="hidden" style="margin-top: var(--sp-40);">
             <div class="card-product-feature">
-                <div style="display: flex; align-items: center; gap: var(--spacing-sm); margin-bottom: var(--spacing-xs);">
-                    <span class="caption-bold" style="color: var(--colors-primary);">STEP 2</span>
+                <div style="display: flex; align-items: center; gap: var(--sp-8); margin-bottom: var(--sp-4);">
+                    <span class="caption-bold" style="color: var(--blue);">STEP 2</span>
                 </div>
                 <h2 class="heading-sm">영상 클립 업로드</h2>
-                <p class="body-sm" style="margin-top: var(--spacing-xs); color: var(--colors-slate);">프롬프트를 복사하여 AI 도구에서 8초짜리 배경 영상을 각각 생성한 뒤 업로드해주세요.</p>
-                
+                <p class="body-sm" style="color: var(--text-secondary); margin-top: var(--sp-4);">프롬프트를 복사해 AI 도구에서 8초짜리 배경 영상을 생성한 뒤 업로드하세요.</p>
+
                 <!-- YouTube Metadata Preview -->
-                <div style="margin: var(--spacing-xl) 0; background: var(--colors-card-alt); border: 1px solid var(--colors-hairline); border-radius: var(--rounded-xl); padding: var(--spacing-lg);">
-                    <div style="display: flex; align-items: center; gap: var(--spacing-xs); margin-bottom: var(--spacing-base);">
-                        <span style="font-size: 14px;">📋</span>
-                        <h3 class="body-sm-bold" style="color: var(--colors-primary);">생성된 유튜브 정보</h3>
-                    </div>
-                    <div style="display: grid; gap: var(--spacing-sm);">
+                <div style="margin: var(--sp-20) 0; background: var(--bg); border: 1px solid var(--divider); border-radius: var(--r-12); padding: var(--sp-16);">
+                    <h3 class="body-sm-bold" style="color: var(--blue); margin-bottom: var(--sp-12);">📋 생성된 유튜브 정보</h3>
+                    <div style="display: grid; gap: var(--sp-10);">
                         <div>
-                            <p class="caption-bold" style="color: var(--colors-stone); margin-bottom: 2px;">제목</p>
-                            <p id="previewTitle" class="body-md" style="color: var(--colors-ink);"></p>
+                            <p class="caption-bold" style="color: var(--text-tertiary); margin-bottom: 2px;">제목</p>
+                            <p id="previewTitle" class="body-md"></p>
                         </div>
                         <div>
-                            <p class="caption-bold" style="color: var(--colors-stone); margin-bottom: 2px;">설명</p>
-                            <p id="previewDescription" class="body-sm" style="white-space: pre-wrap; color: var(--colors-charcoal);"></p>
+                            <p class="caption-bold" style="color: var(--text-tertiary); margin-bottom: 2px;">설명</p>
+                            <p id="previewDescription" class="body-sm" style="white-space: pre-wrap; color: var(--text-secondary);"></p>
                         </div>
                         <div>
-                            <p class="caption-bold" style="color: var(--colors-stone); margin-bottom: 2px;">해시태그</p>
-                            <p id="previewHashtags" class="body-sm" style="color: var(--colors-primary);"></p>
+                            <p class="caption-bold" style="color: var(--text-tertiary); margin-bottom: 2px;">해시태그</p>
+                            <p id="previewHashtags" class="body-sm" style="color: var(--blue);"></p>
                         </div>
                     </div>
                 </div>
 
                 <div id="scenesContainer" class="scenes-grid"></div>
-                
-                <div style="margin-top: var(--spacing-xxl); text-align: center;">
-                    <button id="assembleBtn" class="button-buy-cta" style="padding: 16px 48px; font-size: 15px;" onclick="startAssemble()">최종 조립 및 영상 렌더링 →</button>
+
+                <div style="margin-top: var(--sp-32); text-align: center;">
+                    <button id="assembleBtn" class="button-buy-cta" style="height: 48px; padding: 0 40px; font-size: 15px;" onclick="startAssemble()">최종 조립 및 영상 렌더링</button>
                 </div>
             </div>
         </section>
 
-        <!-- Progress Section -->
-        <section id="progressSection" class="hidden" style="margin-top: var(--spacing-section);">
-            <div class="card-checkout-summary" style="max-width: 500px; margin: 0 auto; text-align: center;">
-                <div style="margin-bottom: var(--spacing-xl);">
-                    <h2 class="heading-sm">영상 제작 중</h2>
-                    <div style="font-size: 36px; font-weight: 800; margin: var(--spacing-lg) 0 var(--spacing-xs); background: var(--gradient-brand); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;">
-                        <span id="progressPercent">0%</span>
-                    </div>
-                    <p id="progressMessage" class="body-sm" style="color: var(--colors-slate);">초기화 중...</p>
+        <!-- ─── Progress ─── -->
+        <section id="progressSection" class="hidden" style="margin-top: var(--sp-64);">
+            <div class="card-checkout-summary" style="max-width: 460px; margin: 0 auto; text-align: center;">
+                <h2 class="heading-sm" style="margin-bottom: var(--sp-4);">영상 제작 중</h2>
+                <div style="font-size: 40px; font-weight: 800; color: var(--blue); margin: var(--sp-16) 0 var(--sp-4);">
+                    <span id="progressPercent">0%</span>
                 </div>
-                
+                <p id="progressMessage" class="body-sm" style="color: var(--text-secondary); margin-bottom: var(--sp-8);">초기화 중...</p>
+
                 <div class="pipeline-steps">
                     <div class="pipeline-step" id="step-article_extraction">
                         <div class="step-circle">1</div>
@@ -169,87 +156,78 @@
             </div>
         </section>
 
-        <!-- Result Section -->
-        <section id="resultSection" class="hidden" style="margin-top: var(--spacing-section);">
+        <!-- ─── Result ─── -->
+        <section id="resultSection" class="hidden" style="margin-top: var(--sp-48);">
             <div class="result-layout">
-                <!-- Video Left -->
                 <div class="video-container">
                     <video id="videoPlayer" controls></video>
                 </div>
-                
-                <!-- Info Right -->
                 <div class="card-checkout-summary">
-                    <div style="display: flex; align-items: center; gap: var(--spacing-sm); margin-bottom: var(--spacing-xs);">
-                        <span style="font-size: 18px;">🎉</span>
-                        <h2 class="heading-sm">제작 완료!</h2>
-                    </div>
-                    <p id="resultTime" class="body-sm" style="color: var(--colors-slate); margin-bottom: var(--spacing-xl);"></p>
-                    
+                    <h2 class="heading-sm" style="margin-bottom: var(--sp-4);">🎉 제작 완료!</h2>
+                    <p id="resultTime" class="body-sm" style="color: var(--text-secondary); margin-bottom: var(--sp-20);"></p>
+
                     <div class="meta-grid">
                         <div class="meta-item">
-                            <h3 class="caption-bold" style="color: var(--colors-stone); margin-bottom: 4px;">유튜브 제목</h3>
+                            <h3 class="caption-bold" style="color: var(--text-tertiary); margin-bottom: 4px;">유튜브 제목</h3>
                             <p id="ytTitle" class="body-md"></p>
                         </div>
                         <div class="meta-item">
-                            <h3 class="caption-bold" style="color: var(--colors-stone); margin-bottom: 4px;">유튜브 설명</h3>
-                            <p id="ytDescription" class="body-sm" style="white-space: pre-wrap; color: var(--colors-charcoal);"></p>
+                            <h3 class="caption-bold" style="color: var(--text-tertiary); margin-bottom: 4px;">유튜브 설명</h3>
+                            <p id="ytDescription" class="body-sm" style="white-space: pre-wrap; color: var(--text-secondary);"></p>
                         </div>
                         <div class="meta-item">
-                            <h3 class="caption-bold" style="color: var(--colors-stone); margin-bottom: 4px;">해시태그 & 태그</h3>
-                            <p id="ytHashtags" class="body-sm" style="color: var(--colors-primary);"></p>
+                            <h3 class="caption-bold" style="color: var(--text-tertiary); margin-bottom: 4px;">해시태그 & 태그</h3>
+                            <p id="ytHashtags" class="body-sm" style="color: var(--blue);"></p>
                         </div>
                     </div>
-                    
-                    <div style="margin-top: var(--spacing-xxl); display: flex; flex-direction: column; gap: var(--spacing-sm);">
-                        <button class="button-buy-cta" onclick="showUploadPreview()" style="width: 100%;">YouTube 바로 업로드</button>
-                        <a id="downloadVideo" class="button-secondary" style="width: 100%; text-align: center; display: inline-flex; justify-content: center;" download>영상 다운로드</a>
+
+                    <div style="margin-top: var(--sp-24); display: flex; flex-direction: column; gap: var(--sp-10);">
+                        <button class="button-buy-cta" onclick="showUploadPreview()" style="width: 100%; height: 44px;">YouTube 바로 업로드</button>
+                        <a id="downloadVideo" class="button-secondary" style="width: 100%; height: 44px; display: inline-flex; align-items: center; justify-content: center;" download>영상 다운로드</a>
                         <button class="button-ghost" onclick="resetUI()" style="width: 100%;">새 영상 만들기</button>
                     </div>
                 </div>
             </div>
         </section>
 
-        <!-- My Page (History) -->
-        <section id="historySection" class="hidden" style="margin-top: var(--spacing-section-sm);">
+        <!-- ─── History ─── -->
+        <section id="historySection" class="hidden" style="margin-top: var(--sp-40);">
             <div class="card-product-feature">
-                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: var(--spacing-lg);">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: var(--sp-16);">
                     <h2 class="heading-sm">마이페이지</h2>
-                    <button class="button-ghost" onclick="fetchHistory()">↻ 새로고침</button>
+                    <button class="button-ghost" onclick="fetchHistory()">새로고침</button>
                 </div>
-                
-                <div id="historyList" class="history-grid">
-                    <!-- History items injected via JS -->
-                </div>
+                <div id="historyList" class="history-grid"></div>
             </div>
         </section>
-        
-        <!-- Error -->
-        <section id="errorSection" class="hidden" style="margin-top: var(--spacing-section); text-align: center;">
-            <div class="card-checkout-summary" style="max-width: 480px; margin: 0 auto; border-color: rgba(248, 113, 113, 0.3);">
-                <div style="font-size: 32px; margin-bottom: var(--spacing-md);">⚠</div>
-                <h2 class="heading-sm" style="color: var(--colors-critical);">오류 발생</h2>
-                <p id="errorMessage" class="body-sm" style="margin: var(--spacing-md) 0; color: var(--colors-charcoal);"></p>
+
+        <!-- ─── Error ─── -->
+        <section id="errorSection" class="hidden" style="margin-top: var(--sp-64); text-align: center;">
+            <div class="card-checkout-summary" style="max-width: 440px; margin: 0 auto;">
+                <div style="width: 48px; height: 48px; border-radius: 50%; background: var(--red-soft); display: flex; align-items: center; justify-content: center; margin: 0 auto var(--sp-16); font-size: 22px;">⚠</div>
+                <h2 class="heading-sm" style="color: var(--red);">오류 발생</h2>
+                <p id="errorMessage" class="body-sm" style="color: var(--text-secondary); margin: var(--sp-12) 0 var(--sp-20);"></p>
                 <button class="button-secondary" onclick="resetUI()">처음으로 돌아가기</button>
             </div>
         </section>
     </main>
-    
+
     <!-- Upload Modal -->
-    <div id="uploadModal" class="hidden" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); backdrop-filter: blur(8px); z-index: 1000; display: flex; align-items: center; justify-content: center;">
-        <div class="card-checkout-summary" style="width: 420px;">
-            <h3 class="heading-sm" style="margin-bottom: var(--spacing-md);">YouTube 업로드</h3>
-            <p class="body-sm" style="margin-bottom: var(--spacing-sm);"><strong>제목:</strong> <span id="modalTitle"></span></p>
-            <div style="margin-bottom: var(--spacing-lg);">
+    <div id="uploadModal" class="hidden" style="position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 1000; display: flex; align-items: center; justify-content: center;">
+        <div class="card-checkout-summary" style="width: 400px;">
+            <h3 class="heading-sm" style="margin-bottom: var(--sp-16);">YouTube 업로드</h3>
+            <p class="body-sm" style="margin-bottom: var(--sp-10);"><strong>제목:</strong> <span id="modalTitle"></span></p>
+            <div style="margin-bottom: var(--sp-20);">
                 <label class="input-label">공개 설정</label>
-                <select id="modalPrivacy" class="text-input" style="height: 42px;">
+                <select id="modalPrivacy" class="text-input" style="height: 40px;">
                     <option value="private">비공개</option>
                     <option value="unlisted">일부 공개</option>
                     <option value="public">공개</option>
                 </select>
             </div>
-            <div style="display: flex; justify-content: flex-end; gap: var(--spacing-sm);">
+            <div style="display: flex; justify-content: flex-end; gap: var(--sp-8);">
                 <button class="button-ghost" onclick="closeUploadPreview()">취소</button>
-                <button class="button-buy-cta" onclick="confirmUploadToYoutube()">승인 및 업로드</button>
+                <button class="button-buy-cta" onclick="confirmUploadToYoutube()">업로드</button>
             </div>
         </div>
     </div>
