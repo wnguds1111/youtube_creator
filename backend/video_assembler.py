@@ -75,7 +75,7 @@ class VideoAssembler:
                         if end > duration: end = duration
                         sub_dur = end - start
                         sub_img = self._create_subtitle_frame(text)
-                        sc = ImageClip(sub_img, duration=sub_dur).set_start(start)
+                        sc = ImageClip(sub_img, duration=sub_dur).with_start(start)
                         sub_clips.append(sc)
                     if sub_clips:
                         scene_clip = CompositeVideoClip([bg_clip] + sub_clips)

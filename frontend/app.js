@@ -313,10 +313,6 @@ function showUploadUI(content) {
                 영상 첨부 (.mp4):
                 <input type="file" accept="video/mp4" class="text-input vid-input" style="height: auto; padding: 8px; margin-top: 4px;">
             </label>
-            <label class="body-sm-bold" style="display: block; margin-top: 12px; color: var(--colors-slate);">
-                직접 생성한 이미지 첨부 (옵션, 여러 장 선택 가능):
-                <input type="file" accept="image/*" multiple class="text-input img-input" style="height: auto; padding: 8px; margin-top: 4px;">
-            </label>
         `;
         container.appendChild(div);
     });
@@ -325,7 +321,6 @@ function showUploadUI(content) {
 async function startAssemble() {
     const scenesContainer = document.getElementById('scenesContainer');
     const fileInputs = scenesContainer.querySelectorAll('input.vid-input');
-    const imgInputs = scenesContainer.querySelectorAll('input.img-input');
     
     const formData = new FormData();
     let fileCount = 0;
@@ -337,13 +332,6 @@ async function startAssemble() {
         } else {
             showToast('❌ 모든 장면의 영상을 첨부해주세요.');
             return;
-        }
-    }
-
-    // Add images if any
-    for (const input of imgInputs) {
-        for(let j=0; j<input.files.length; j++) {
-            formData.append('image_files', input.files[j]);
         }
     }
 

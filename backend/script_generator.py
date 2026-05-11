@@ -144,12 +144,12 @@ class ScriptGenerator:
 - 주의: 마무리 인사나 "구독, 좋아요" 멘트는 절대 넣지 말고 임팩트 있게 끝내세요.
 
 ### 7. 장면 구성 (scenes)
-- 전체 내용을 반드시 **정확히 3개의 장면(scene)**으로 나누세요. (8초짜리 영상 3개를 연결하기 위함입니다.)
+- 전체 내용을 반드시 **정확히 3개의 장면(scene)**으로 나누세요. (10초짜리 영상 3개를 연결하기 위함입니다.)
 - 각 장면:
   - scene_num: 1, 2, 3
   - narration: 각 장면에 해당하는 나레이션 대사 배분 (합치면 전체 나레이션과 동일해야 함)
-  - visual_prompt: 영문 프롬프트. 세로형 9:16 비율에 맞춘 시각적 묘사.
-  - duration_sec: 각 8초 (총 24초 내외)
+  - visual_prompt: 영문 프롬프트. 세로형 9:16 비율에 맞춘 시각적 묘사. 주의: 프롬프트에 글자, 텍스트, 단어, 로고, 캡션 등을 생성하라는 내용은 절대 포함하지 마세요. (No text, no letters, no words, no captions, no logos)
+  - duration_sec: 각 10초 (총 30초 내외)
 - **중요(Style Consistency):** 3개의 `visual_prompt`는 캐릭터, 배경, 색감 등 시각적 스타일이 최대한 일관되게(Consistent visual style) 유지되도록 작성해야 합니다.
 
 ### 8. 태그 (tags)
@@ -157,7 +157,7 @@ class ScriptGenerator:
 
 ## 중요 규칙
 - 모든 내용은 한국어로 작성
-- visual_prompt만 영어로 작성 (9:16 세로형 포맷 강조)
+- visual_prompt만 영어로 작성 (9:16 세로형 포맷 강조, 텍스트/글자/단어 등 절대 포함 금지)
 - 자극적이되 허위 정보는 절대 포함하지 않기
 - 원본 기사의 사실 관계를 정확히 유지
 
@@ -175,19 +175,19 @@ class ScriptGenerator:
             "scene_num": 1,
             "narration": "...",
             "visual_prompt": "...",
-            "duration_sec": 8
+            "duration_sec": 10
         }},
         {{
             "scene_num": 2,
             "narration": "...",
             "visual_prompt": "...",
-            "duration_sec": 8
+            "duration_sec": 10
         }},
         {{
             "scene_num": 3,
             "narration": "...",
             "visual_prompt": "...",
-            "duration_sec": 8
+            "duration_sec": 10
         }}
     ],
     "tags": ["...", "..."]
@@ -217,19 +217,19 @@ class ScriptGenerator:
                     "scene_num": 1,
                     "narration": article['text'][:200],
                     "visual_prompt": "News broadcast studio with modern graphics, vertical 9:16",
-                    "duration_sec": 8
+                    "duration_sec": 10
                 },
                 {
                     "scene_num": 2,
                     "narration": article['text'][200:400] if len(article['text']) > 200 else "...",
                     "visual_prompt": "News broadcast studio with modern graphics, vertical 9:16",
-                    "duration_sec": 8
+                    "duration_sec": 10
                 },
                 {
                     "scene_num": 3,
                     "narration": article['text'][400:600] if len(article['text']) > 400 else "...",
                     "visual_prompt": "News broadcast studio with modern graphics, vertical 9:16",
-                    "duration_sec": 8
+                    "duration_sec": 10
                 }
             ],
             "tags": article.get('keywords', ['뉴스'])[:10]
