@@ -292,6 +292,57 @@ async def assemble_video(
     return JSONResponse(content=active_jobs[job_id])
 
 
+@app.post("/api/auto-generate", response_model=JobStatus)
+async def auto_generate_video(request: PrepareRequest, username: str = Depends(get_current_user)):
+    """논스톱 완전 자동화: 대본 추출부터 Omni 영상 생성, 최종 조립까지 한 번에 실행"""
+    gemini_key = request.gemini_api_key or os.getenv("GEMINI_API_KEY")
+    if not gemini_key or gemini_key == "your_gemini_api_key_here":
+        raise HTTPException(status_code=400, detail="GEMINI_API_KEY가 설정되지 않았습니다.")
+
+    config = {
+        "gemini_api_key": gemini_key,
+        "gemini_model": request.gemini_model,
+        "language": request.language,
+        "tts_lang": request.language,
+        "tts_voice": request.tts_voice,
+        "tts_speed": request.tts_speed,
+        "video_width": request.video_width,
+        "video_height": request.video_height,
+        "target_duration": request.target_duration,
+        "output_dir": OUTPUT_DIR,
+        "owner": username,
+    }
+
+    job_id = datetime.now().strftime("%Y%m%d_%H%M%S")
+    
+    active_jobs[job_id] = {
+        "job_id": job_id,
+        "status": "running",
+        "current_step": "initialize",
+        "steps_completed": [],
+        "progress_message": "자동화 파이프라인 시작 중...",
+        "result": None,
+        "error": None,
+    }
+
+    pipeline = Pipeline(config)
+
+    async def _run_auto_generate():
+        def callback(step, progress, message):
+            active_jobs[job_id]["current_step"] = step
+            active_jobs[job_id]["progress_message"] = message
+            if progress >= 100 and step not in active_jobs[job_id]["steps_completed"]:
+                active_jobs[job_id]["steps_completed"].append(step)
+            
+        loop = asyncio.get_event_loop()
+        result = await loop.run_in_executor(None, lambda: pipeline.auto_generate(request.url, callback))
+        active_jobs[job_id].update(result)
+
+    asyncio.create_task(_run_auto_generate())
+    
+    return JSONResponse(content=active_jobs[job_id])
+
+
 @app.get("/api/status/{job_id}")
 async def get_status(job_id: str):
     """작업 상태를 조회합니다"""

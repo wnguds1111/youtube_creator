@@ -16,6 +16,7 @@ from tts_gemini import GeminiTTSEngine
 from subtitle_generator import SubtitleGenerator
 from video_assembler import VideoAssembler
 from credit_tracker import get_tracker
+from omni_video_generator import OmniVideoGenerator
 
 logger = logging.getLogger(__name__)
 
@@ -42,6 +43,7 @@ class Pipeline:
             height=config.get("video_height", 1920),
             fps=config.get("video_fps", 30),
         )
+        self.omni_gen = OmniVideoGenerator(api_key=api_key)
 
     def prepare(self, url: str) -> dict:
         """1단계: 기사 추출 및 대본/프롬프트 생성"""
@@ -174,3 +176,39 @@ class Pipeline:
                 callback("error", 0, f"오류 발생: {str(e)}")
 
         return result
+
+    def auto_generate(self, url: str, callback=None) -> dict:
+        """논스톱 완전 자동화 파이프라인 (대본 추출 -> 숏츠 비디오 전체 자동 생성)"""
+        start_time = time.time()
+        
+        # 1. Prepare
+        if callback: callback("prepare", 0, "기사 추출 및 대본 작성 중...")
+        prepare_result = self.prepare(url)
+        project_id = prepare_result["project_id"]
+        content = prepare_result["content"]
+        project_dir = os.path.join(self.output_base, project_id)
+        
+        # 2. Omni 비디오 클립 생성
+        if callback: callback("video_generation", 0, "Omni AI를 사용해 비디오 클립을 자동 생성하는 중...")
+        veo_clips = []
+        scenes = content.get("scenes", [])
+        
+        veo_clips_dir = os.path.join(project_dir, "veo_clips")
+        os.makedirs(veo_clips_dir, exist_ok=True)
+        
+        for i, scene in enumerate(scenes):
+            scene_num = scene.get("scene_num", i+1)
+            prompt = scene.get("visual_prompt", "")
+            if callback: callback("video_generation", int((i / max(1, len(scenes))) * 100), f"장면 {scene_num}/{len(scenes)} 비디오 생성 중...")
+            
+            output_path = os.path.join(veo_clips_dir, f"scene_{scene_num:02d}.mp4")
+            generated_path = self.omni_gen.generate_clip(prompt, output_path, duration_sec=scene.get("duration_sec", 10))
+            if generated_path:
+                veo_clips.append(generated_path)
+            else:
+                logger.warning(f"장면 {scene_num} 비디오 생성 실패, 건너뜁니다.")
+        
+        if callback: callback("video_generation", 100, "모든 비디오 클립 생성 완료")
+        
+        # 3. Assemble
+        return self.assemble(project_id, uploaded_clips=veo_clips, callback=callback)
