@@ -70,12 +70,53 @@ class Pipeline:
         with open(os.path.join(project_dir, "content.json"), "w", encoding="utf-8") as f:
             json.dump(content, f, ensure_ascii=False, indent=2)
             
+        # 썸네일 자동 생성
+        self._generate_thumbnail(content, project_dir, self.config.get("omni_template"))
+            
         logger.info(f"[{project_id}] 1단계 완료! ({time.time() - start_time:.1f}초)")
         
         return {
             "project_id": project_id,
             "content": content
         }
+
+    def _generate_thumbnail(self, content: dict, project_dir: str, omni_template: str):
+        """Imagen 3.0 모델을 사용하여 유튜브용 16:9 썸네일을 자동 생성합니다."""
+        logger.info("🎨 유튜브 썸네일 이미지 생성 중...")
+        try:
+            from google import genai
+            from google.genai import types
+            import io
+            from PIL import Image
+            
+            client = genai.Client(api_key=self.config["gemini_api_key"])
+            
+            style_prefix = f"[{omni_template} style] " if omni_template else ""
+            prompt_base = content.get("thumbnail_text", "") + " " + content.get("thumbnail_subtitle", "")
+            if not prompt_base.strip() and content.get("scenes"):
+                prompt_base = content["scenes"][0].get("visual_prompt", "")
+                
+            prompt = f"{style_prefix}Create a highly engaging YouTube thumbnail background image for a video about: {prompt_base}. No text, no words, no letters. Masterpiece, highly detailed."
+            
+            result = client.models.generate_images(
+                model='imagen-3.0-generate-001',
+                prompt=prompt,
+                config=types.GenerateImagesConfig(
+                    number_of_images=1,
+                    aspect_ratio="16:9",
+                    output_mime_type="image/jpeg",
+                )
+            )
+            
+            if result.generated_images:
+                img_bytes = result.generated_images[0].image.image_bytes
+                img = Image.open(io.BytesIO(img_bytes))
+                
+                thumbnail_path = os.path.join(project_dir, "thumbnail.png")
+                img.save(thumbnail_path, format="PNG")
+                logger.info(f"✅ 썸네일 생성 완료: {thumbnail_path}")
+        except Exception as e:
+            logger.error(f"⚠️ 썸네일 생성 실패 (건너뜀): {e}")
 
     def assemble(self, project_id: str, uploaded_clips: List[str], uploaded_images: List[str] = None, callback=None) -> dict:
         """2단계: 업로드된 영상 기반으로 음성, 자막, 영상 조립 및 유튜브 업로드"""

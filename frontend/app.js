@@ -249,7 +249,8 @@ async function startPrepare() {
         video_width: 1080,
         video_height: 1920,
         target_duration: 30,
-        gemini_api_key: document.getElementById('optApiKey').value.trim() || undefined
+        gemini_api_key: document.getElementById('optApiKey').value.trim() || undefined,
+        omni_template: document.getElementById('optOmniTemplate').value || undefined
     };
 
     try {
@@ -276,7 +277,7 @@ async function startPrepare() {
         showError(err.message);
     } finally {
         btn.disabled = false;
-        btn.textContent = '대본 및 프롬프트 추출하기';
+        btn.textContent = '대본 및 프롬프트 추출 (수동 영상 첨부용)';
     }
 }
 
@@ -354,6 +355,13 @@ function showUploadUI(content) {
     document.getElementById('previewTitle').textContent = content.youtube_title || '제목 없음';
     document.getElementById('previewDescription').textContent = content.youtube_description || '설명 없음';
     document.getElementById('previewHashtags').textContent = (content.hashtags || []).join(' ') + ' ' + (content.tags || []).join(' ');
+    
+    // 썸네일 미리보기
+    const thumbImg = document.getElementById('previewThumbnail');
+    if (thumbImg) {
+        thumbImg.src = `/output/${currentJobId}/thumbnail.png`;
+        thumbImg.style.display = 'block';
+    }
     
     content.scenes.forEach((scene, index) => {
         const div = document.createElement('div');

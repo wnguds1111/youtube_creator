@@ -150,7 +150,7 @@ class ScriptGenerator:
 - 각 장면:
   - scene_num: 1, 2, 3
   - narration: 각 장면에 해당하는 나레이션 대사 배분 (합치면 전체 나레이션과 동일해야 함)
-  - visual_prompt: 영문 프롬프트. 세로형 9:16 비율에 맞춘 시각적 묘사. 주의: 프롬프트에 글자, 텍스트, 단어, 로고, 캡션 등을 생성하라는 내용은 절대 포함하지 마세요. (No text, no letters, no words, no captions, no logos)
+  - visual_prompt: 외부 AI 비디오 생성기에 복사해서 붙여넣기 좋게 아주 간결한 영어 단어 위주로 작성할 것 (최대 20단어). 세로형 9:16 비율에 맞춘 시각적 묘사. 주의: 프롬프트에 글자, 텍스트, 단어, 로고, 캡션 등을 생성하라는 내용은 절대 포함하지 마세요. (No text, no letters, no words, no captions, no logos)
   - duration_sec: 각 10초 (총 30초 내외)
 - **중요(Style Consistency):** 3개의 `visual_prompt`는 캐릭터, 배경, 색감 등 시각적 스타일이 최대한 일관되게(Consistent visual style) 유지되도록 작성해야 합니다.
 

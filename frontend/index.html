@@ -51,7 +51,7 @@
 
             <div class="url-input-container">
                 <input type="url" id="urlInput" class="text-input" placeholder="https://news.example.com/article" style="height: 50px; font-size: 16px;">
-                <button id="prepareBtn" class="button-buy-cta" style="height: 50px; font-size: 15px;" onclick="startAutoGenerate()">원클릭 자동 영상 제작</button>
+                <button id="prepareBtn" class="button-buy-cta" style="height: 50px; font-size: 15px;" onclick="startPrepare()">대본 및 프롬프트 추출 (수동 영상 첨부용)</button>
 
                 <div class="options-panel">
                     <div style="cursor: pointer; display: flex; justify-content: space-between; align-items: center;" onclick="document.getElementById('optGrid').classList.toggle('hidden')">
@@ -123,6 +123,10 @@
                 <div style="margin: var(--sp-20) 0; background: var(--bg); border: 1px solid var(--divider); border-radius: var(--r-12); padding: var(--sp-16);">
                     <h3 class="body-sm-bold" style="color: var(--blue); margin-bottom: var(--sp-12);">📋 생성된 유튜브 정보</h3>
                     <div style="display: grid; gap: var(--sp-10);">
+                        <div>
+                            <p class="caption-bold" style="color: var(--text-tertiary); margin-bottom: 2px;">썸네일 컷 (자동생성)</p>
+                            <img id="previewThumbnail" src="" style="width: 100%; max-width: 400px; aspect-ratio: 16/9; object-fit: cover; border-radius: 8px; border: 1px solid var(--divider); display: none;">
+                        </div>
                         <div>
                             <p class="caption-bold" style="color: var(--text-tertiary); margin-bottom: 2px;">제목</p>
                             <p id="previewTitle" class="body-md"></p>
