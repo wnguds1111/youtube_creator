@@ -363,7 +363,14 @@ function showUploadUI(content) {
         thumbImg.style.display = 'block';
     }
     
+    const selectedTemplate = document.getElementById('optOmniTemplate').value;
+    
     content.scenes.forEach((scene, index) => {
+        let displayPrompt = scene.visual_prompt || "프롬프트 없음";
+        if (selectedTemplate && !displayPrompt.includes(selectedTemplate)) {
+            displayPrompt = `[${selectedTemplate} style] ${displayPrompt}`;
+        }
+        
         const div = document.createElement('div');
         div.className = 'scene-card';
         div.innerHTML = `
@@ -372,9 +379,9 @@ function showUploadUI(content) {
             </div>
             <p class="body-sm" style="margin-bottom: var(--spacing-sm); color: var(--colors-slate);"><strong>나레이션:</strong> ${scene.narration}</p>
             <div class="scene-prompt">
-                ${scene.visual_prompt || "프롬프트 없음"}
+                ${displayPrompt}
             </div>
-            <button class="button-ghost" style="padding: 4px 12px; font-size: 12px; margin-bottom: var(--spacing-sm);" onclick="navigator.clipboard.writeText('${(scene.visual_prompt||"").replace(/'/g, "\\'")}')">프롬프트 복사</button>
+            <button class="button-ghost" style="padding: 4px 12px; font-size: 12px; margin-bottom: var(--spacing-sm);" onclick="navigator.clipboard.writeText('${displayPrompt.replace(/'/g, "\\'")}')">프롬프트 복사</button>
             <label class="body-sm-bold" style="display: block;">
                 영상 첨부 (.mp4):
                 <input type="file" accept="video/mp4" class="text-input vid-input" style="height: auto; padding: 8px; margin-top: 4px;">
