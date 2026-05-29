@@ -548,10 +548,28 @@ function showResult(result) {
 
     document.getElementById('ytTitle').textContent = metadata.youtube_title || '';
     document.getElementById('ytDescription').textContent = metadata.youtube_description || '';
-    document.getElementById('ytHashtags').textContent = (metadata.hashtags || []).join(' ') + ' ' + (metadata.tags || []).join(' ');
+    
+    // 해시태그 파싱 오류 시 폴백
+    let hashtags = metadata.hashtags || [];
+    let tags = metadata.tags || [];
+    if (hashtags.length === 0 && tags.length === 0) {
+        hashtags = ["#쇼츠", "#뉴스", "#정보"];
+    }
+    document.getElementById('ytHashtags').textContent = hashtags.join(' ') + ' ' + tags.join(' ');
 
     document.getElementById('downloadVideo').href = `/output/${projectId}/final_video.mp4`;
     document.getElementById('resultTime').textContent = `소요 시간: ${result.duration_sec || '?'}초`;
+
+    // YouTube 업로드 버튼 표시 여부 확인
+    fetch(`${API_BASE}/api/youtube/status`)
+        .then(res => res.json())
+        .then(data => {
+            const btn = document.getElementById('btnYoutubeUpload');
+            if (btn && data.configured) {
+                btn.style.display = 'block';
+            }
+        })
+        .catch(err => console.warn('YouTube status fetch failed:', err));
 }
 
 function showError(message) {
