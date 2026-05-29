@@ -82,6 +82,7 @@ class PrepareRequest(BaseModel):
     target_duration: int = 50
     gemini_api_key: Optional[str] = None
     omni_template: Optional[str] = None
+    tts_voice: Optional[str] = "Puck"
 
 class JobStatus(BaseModel):
     job_id: str

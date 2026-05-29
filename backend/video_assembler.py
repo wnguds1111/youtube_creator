@@ -295,7 +295,7 @@ class VideoAssembler:
         overlay = Image.new("RGBA", (self.width, self.height), (0, 0, 0, 0))
         draw = ImageDraw.Draw(overlay)
 
-        font = self._get_font(48, bold=True)
+        font = self._get_font(50, bold=True)
 
         # 자막 줄바꿈 처리
         max_chars_per_line = 18 if self.width < self.height else 28
