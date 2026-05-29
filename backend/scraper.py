@@ -44,8 +44,40 @@ class ArticleScraper:
         logger.info(f"🔍 기사 추출 시작: {url}")
 
         try:
-            resp = requests.get(url, headers=self.HEADERS, timeout=15)
-            resp.raise_for_status()
+            try:
+                resp = requests.get(url, headers=self.HEADERS, timeout=15)
+                resp.raise_for_status()
+            except requests.exceptions.RequestException as e:
+                logger.warning(f"⚠️ 기본 User-Agent로 요청 실패 ({e}). Googlebot으로 재시도합니다.")
+                googlebot_headers = {
+                    "User-Agent": "Mozilla/5.0 (compatible; Googlebot/2.1; +http://www.google.com/bot.html)"
+                }
+                try:
+                    resp = requests.get(url, headers=googlebot_headers, timeout=15)
+                    resp.raise_for_status()
+                except requests.exceptions.RequestException as e2:
+                    logger.warning(f"⚠️ Googlebot 요청도 실패 ({e2}). Jina Reader API로 재시도합니다.")
+                    jina_url = f"https://r.jina.ai/{url}"
+                    jina_resp = requests.get(jina_url, timeout=20)
+                    jina_resp.raise_for_status()
+                    
+                    parsed = urlparse(url)
+                    source_name = parsed.netloc.replace("www.", "")
+                    
+                    # Jina Reader는 Markdown 텍스트를 바로 반환합니다.
+                    return {
+                        "url": url,
+                        "title": "Jina Reader 추출 기사",
+                        "text": jina_resp.text,
+                        "summary": jina_resp.text[:300],
+                        "authors": [],
+                        "publish_date": None,
+                        "top_image": None,
+                        "images": [],
+                        "keywords": [],
+                        "source_name": source_name
+                    }
+                
             soup = BeautifulSoup(resp.text, "lxml")
 
             # 제목 추출
@@ -64,6 +96,16 @@ class ArticleScraper:
                 paragraphs = soup.find_all("p")
 
             text = "\n\n".join(p.get_text(strip=True) for p in paragraphs if len(p.get_text(strip=True)) > 20)
+            
+            # 본문이 추출되지 않은 경우 (p 태그가 비어있는 형태의 사이트 등)
+            if len(text) < 50:
+                if article_tag:
+                    text = article_tag.get_text(separator="\n\n", strip=True)
+                else:
+                    text = soup.body.get_text(separator="\n\n", strip=True) if soup.body else soup.get_text(separator="\n\n", strip=True)
+            
+            if len(text) < 50:
+                raise ValueError("기사 본문을 찾을 수 없습니다.")
 
             # 이미지 추출
             images = self._extract_extra_images(url, soup=soup)
