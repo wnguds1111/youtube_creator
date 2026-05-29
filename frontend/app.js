@@ -303,7 +303,8 @@ async function startAutoGenerate() {
         video_width: 1080,
         video_height: 1920,
         target_duration: 30,
-        gemini_api_key: document.getElementById('optApiKey').value.trim() || undefined
+        gemini_api_key: document.getElementById('optApiKey').value.trim() || undefined,
+        omni_template: document.getElementById('optOmniTemplate').value || undefined
     };
 
     showProgressUI();

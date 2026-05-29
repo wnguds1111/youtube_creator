@@ -20,7 +20,7 @@ class ScriptGenerator:
         self.model_name = model_name
         logger.info(f"🤖 ScriptGenerator 초기화 (모델: {model_name})")
 
-    def generate(self, article: dict, style: str = "cinematic", reference_url: str = None, target_duration: int = 50) -> dict:
+    def generate(self, article: dict, style: str = "cinematic", reference_url: str = None, target_duration: int = 50, omni_template: str = None) -> dict:
         """
         기사 데이터로부터 유튜브 콘텐츠 전체를 생성합니다.
 
@@ -41,7 +41,7 @@ class ScriptGenerator:
         """
         logger.info("📝 대본 및 메타데이터 생성 중...")
 
-        prompt = self._build_prompt(article, style, reference_url, target_duration)
+        prompt = self._build_prompt(article, style, reference_url, target_duration, omni_template)
 
         try:
             response = self.client.models.generate_content(
@@ -83,11 +83,13 @@ class ScriptGenerator:
             logger.error(f"❌ Gemini 생성 실패: {e}")
             raise
 
-    def _build_prompt(self, article: dict, style: str, reference_url: str, target_duration: int) -> str:
+    def _build_prompt(self, article: dict, style: str, reference_url: str, target_duration: int, omni_template: str) -> str:
         """Gemini에 보낼 프롬프트를 구성"""
         
         style_instruction = ""
-        if style == "photorealistic":
+        if omni_template:
+            style_instruction = f"이 영상은 Omni 템플릿 '{omni_template}' 스타일로 제작됩니다. 중요: 3개의 모든 장면(scene)의 `visual_prompt` 시작 부분에 반드시 `[{omni_template} style],` 이라는 지시어를 똑같이 고정값으로 적어주세요. 이를 통해 3개의 영상 클립 전체가 완벽하게 동일한 시각적 컨셉을 유지해야 합니다."
+        elif style == "photorealistic":
             style_instruction = "이 영상은 '극사실주의(Photorealistic) 실사' 스타일로 제작됩니다. visual_prompt 작성 시 반드시 실사, 카메라 촬영, 8k 화질, 자연광 등의 키워드를 강조하세요."
         elif style == "animation":
             style_instruction = "이 영상은 '애니메이션(Animation)' 스타일로 제작됩니다. visual_prompt 작성 시 반드시 스튜디오 지브리, 애니메이션, 생동감 넘치는 색감, 2D 셀 셰이딩 등의 키워드를 강조하세요."

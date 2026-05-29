@@ -81,6 +81,7 @@ class PrepareRequest(BaseModel):
     video_height: int = 1920
     target_duration: int = 50
     gemini_api_key: Optional[str] = None
+    omni_template: Optional[str] = None
 
 class JobStatus(BaseModel):
     job_id: str
@@ -197,6 +198,7 @@ async def prepare_video(request: PrepareRequest, username: str = Depends(get_cur
         "target_duration": request.target_duration,
         "output_dir": OUTPUT_DIR,
         "owner": username,
+        "omni_template": request.omni_template,
     }
 
     pipeline = Pipeline(config)
@@ -311,6 +313,7 @@ async def auto_generate_video(request: PrepareRequest, username: str = Depends(g
         "target_duration": request.target_duration,
         "output_dir": OUTPUT_DIR,
         "owner": username,
+        "omni_template": request.omni_template,
     }
 
     job_id = datetime.now().strftime("%Y%m%d_%H%M%S")
