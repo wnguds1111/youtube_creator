@@ -65,14 +65,13 @@ class OmniVideoGenerator:
                 # response.video_bytes 나 response.candidates[0].content.parts[0].video.data 등을 확인해야 함
                 # 여기서는 범용적인 다운로드 및 바이트 저장 로직을 시도
                 
-                # TODO: 실제 API 응답 구조에 맞게 수정 필요
-                # 임시로 더미 비디오를 생성하여 테스트 환경에서도 동작하게 함
-                self._create_dummy_video(output_path, duration_sec)
-                logger.info(f"✅ 비디오 생성 완료 (API 연동 됨): {output_path}")
+                # TODO: 현재 Veo API 접근 권한 제약으로 인해 Imagen 3.0 이미지 기반 비디오로 대체합니다.
+                self._create_placeholder_video(prompt, output_path, duration_sec)
+                logger.info(f"✅ 비디오 생성 완료 (Imagen 대체 됨): {output_path}")
                 
             except Exception as api_err:
-                logger.warning(f"⚠️ API 호출 실패 혹은 권한 없음 ({api_err}). 테스트용 더미 비디오로 대체합니다.")
-                self._create_dummy_video(output_path, duration_sec)
+                logger.warning(f"⚠️ API 호출 실패 혹은 권한 없음 ({api_err}). 이미지 기반 대체 비디오를 생성합니다.")
+                self._create_placeholder_video(prompt, output_path, duration_sec)
                 
             # 성공 시 크레딧 차감 기록 (Veo Fast 기준 20 크레딧 차감 가정)
             self.tracker.record_usage("veo_fast", 1, "Omni 자동 비디오 생성 (10초)")
@@ -83,16 +82,61 @@ class OmniVideoGenerator:
             logger.error(f"❌ 비디오 생성 중 알 수 없는 오류 발생: {e}", exc_info=True)
             return None
             
-    def _create_dummy_video(self, output_path: str, duration_sec: int):
-        """테스트/폴백용 더미 비디오 생성 (MoviePy 이용)"""
-        from moviepy import ColorClip
-        import numpy as np
+    def _create_placeholder_video(self, prompt: str, output_path: str, duration_sec: int):
+        """Veo 영상 생성 API 권한이 없을 경우, Imagen으로 이미지를 생성한 후 MoviePy로 영상 클립을 만듭니다."""
+        from moviepy.editor import ImageClip, ColorClip
+        import tempfile
+        import io
+        from PIL import Image
         
-        # 9:16 비율 (1080x1920) 보라색 배경 더미 비디오
+        try:
+            logger.info("🎨 Imagen 3.0으로 대체 이미지 생성 중...")
+            result = self.client.models.generate_images(
+                model='imagen-3.0-generate-001',
+                prompt=prompt,
+                config=types.GenerateImagesConfig(
+                    number_of_images=1,
+                    aspect_ratio="9:16",
+                    output_mime_type="image/jpeg",
+                )
+            )
+            
+            if result.generated_images:
+                # Save the generated image
+                img_bytes = result.generated_images[0].image.image_bytes
+                img = Image.open(io.BytesIO(img_bytes))
+                
+                with tempfile.NamedTemporaryFile(suffix=".jpg", delete=False) as temp_img:
+                    img_path = temp_img.name
+                    img.save(img_path)
+                
+                logger.info("🎞️ 생성된 이미지로 비디오 클립 렌더링 중...")
+                clip = ImageClip(img_path).set_duration(duration_sec)
+                
+                os.makedirs(os.path.dirname(output_path) or ".", exist_ok=True)
+                clip.write_videofile(
+                    output_path,
+                    fps=30,
+                    codec="libx264",
+                    logger=None,
+                    audio=False
+                )
+                
+                # Cleanup
+                clip.close()
+                try:
+                    os.remove(img_path)
+                except:
+                    pass
+                return
+        except Exception as e:
+            logger.error(f"❌ Imagen 대체 생성도 실패했습니다: {e}")
+            
+        # 최후의 보루: 진짜 더미 보라색 배경
+        logger.info("🟣 최후의 보루: 보라색 더미 비디오 생성")
         color = (138, 43, 226)  # Blue Violet
         clip = ColorClip(size=(1080, 1920), color=color, duration=duration_sec)
         
-        # mp4로 내보내기
         os.makedirs(os.path.dirname(output_path) or ".", exist_ok=True)
         clip.write_videofile(
             output_path,
@@ -101,3 +145,4 @@ class OmniVideoGenerator:
             logger=None,
             audio=False
         )
+        clip.close()

@@ -165,7 +165,7 @@ class Pipeline:
                 json.dump(metadata, f, ensure_ascii=False, indent=2)
 
             result["status"] = "success"
-            result["result"] = {"video_path": final_video_path, "project_id": project_id}
+            result["result"] = {"video_path": final_video_path, "project_id": project_id, "metadata": metadata}
             update("complete", 100, f"🎉 전체 파이프라인 완료! ({time.time() - start_time:.1f}초)")
 
         except Exception as e:
