@@ -141,7 +141,7 @@ class ScriptGenerator:
 ### 6. 나레이션 대본 (narration_script)
 - 전체 나레이션을 하나의 연속된 텍스트로 작성
 - 유튜브 쇼츠(Shorts)용 약 25~30초 분량 ({min_chars}~{max_chars}자)
-- 도입(Hook) → 본론(전개) → 결론(마무리) 구조
+- 반드시 '기(Hook/도입) → 승(전개) → 전(반전/절정) → 결(마무리)'의 4단계 기승전결 스토리텔링 구조가 명확하게 드러나도록 작성
 - 세로형 영상(9:16)에 어울리는 빠른 템포와 강렬한 흡입력
 - 주의: 마무리 인사나 "구독, 좋아요" 멘트는 절대 넣지 말고 임팩트 있게 끝내세요.
 
@@ -150,7 +150,7 @@ class ScriptGenerator:
 - 각 장면:
   - scene_num: 1, 2, 3
   - narration: 각 장면에 해당하는 나레이션 대사 배분 (합치면 전체 나레이션과 동일해야 함)
-  - visual_prompt: 외부 AI 비디오 생성기에 복사해서 붙여넣기 좋게 아주 간결한 영어 단어 위주로 작성할 것 (최대 20단어). 세로형 9:16 비율에 맞춘 시각적 묘사. 주의: 프롬프트에 글자, 텍스트, 단어, 로고, 캡션 등을 생성하라는 내용은 절대 포함하지 마세요. (No text, no letters, no words, no captions, no logos)
+  - visual_prompt: 외부 AI 비디오 생성기에 복사해서 붙여넣기 좋게 아주 간결한 영어 단어 위주로 작성할 것 (최대 20단어). 세로형 9:16 비율에 맞춘 시각적 묘사. 주의: 프롬프트에 글자, 텍스트, 한자(중문), 영어 단어, 로고, 캡션 등을 생성하라는 내용은 절대 포함하지 마세요. (Absolutely NO Chinese characters, NO text, NO letters, NO words, NO logos)
   - duration_sec: 각 10초 (총 30초 내외)
 - **중요(Style Consistency):** 3개의 `visual_prompt`는 캐릭터, 배경, 색감 등 시각적 스타일이 최대한 일관되게(Consistent visual style) 유지되도록 작성해야 합니다.
 
@@ -159,7 +159,7 @@ class ScriptGenerator:
 
 ## 중요 규칙
 - 모든 내용은 한국어로 작성
-- visual_prompt만 영어로 작성 (9:16 세로형 포맷 강조, 텍스트/글자/단어 등 절대 포함 금지)
+- visual_prompt만 영어로 작성 (9:16 세로형 포맷 강조, 텍스트/한자/글자/단어 등 절대 포함 금지)
 - 자극적이되 허위 정보는 절대 포함하지 않기
 - 원본 기사의 사실 관계를 정확히 유지
 

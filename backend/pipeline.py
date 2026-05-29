@@ -96,7 +96,7 @@ class Pipeline:
             if not prompt_base.strip() and content.get("scenes"):
                 prompt_base = content["scenes"][0].get("visual_prompt", "")
                 
-            prompt = f"{style_prefix}Create a highly engaging YouTube thumbnail background image for a video about: {prompt_base}. No text, no words, no letters. Masterpiece, highly detailed."
+            prompt = f"{style_prefix}Create a highly engaging YouTube thumbnail background image for a video about: {prompt_base}. Absolutely NO Chinese characters, NO text, NO words, NO letters anywhere in the image. Masterpiece, highly detailed, strong {omni_template if omni_template else 'cinematic'} aesthetic."
             
             result = client.models.generate_images(
                 model='imagen-3.0-generate-001',
