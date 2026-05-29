@@ -486,17 +486,27 @@ function updateProgress(data) {
     const { step, message, steps_completed } = data;
     if (message) document.getElementById('progressMessage').textContent = message;
 
-    const allSteps = ['article_extraction', 'tts_narration', 'video_assembly'];
+    const allSteps = ['prepare', 'video_generation', 'tts_narration', 'video_assembly'];
     let completedCount = 0;
     allSteps.forEach(s => {
         const el = document.getElementById(`step-${s}`);
         if (!el) return;
         el.classList.remove('active', 'completed');
-        if (steps_completed && steps_completed.includes(s)) {
+        
+        let isCompleted = steps_completed && steps_completed.includes(s);
+        let isActive = s === step;
+
+        // subtitle_generation is part of tts_narration step in UI
+        if (s === 'tts_narration') {
+            if (steps_completed && steps_completed.includes('subtitle_generation')) isCompleted = true;
+            if (step === 'subtitle_generation') isActive = true;
+        }
+
+        if (isCompleted) {
             el.classList.add('completed');
             completedCount++;
         }
-        else if (s === step) {
+        else if (isActive) {
             el.classList.add('active');
             completedCount += 0.5;
         }

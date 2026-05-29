@@ -132,16 +132,20 @@
                 <p id="progressMessage" class="body-sm" style="color: var(--text-secondary); margin-bottom: var(--sp-8);">초기화 중...</p>
 
                 <div class="pipeline-steps">
-                    <div class="pipeline-step" id="step-article_extraction">
+                    <div class="pipeline-step" id="step-prepare">
                         <div class="step-circle">1</div>
                         <span class="body-sm-bold">기사 분석 및 대본 작성</span>
                     </div>
-                    <div class="pipeline-step" id="step-tts_narration">
+                    <div class="pipeline-step" id="step-video_generation">
                         <div class="step-circle">2</div>
+                        <span class="body-sm-bold">AI 비디오 생성</span>
+                    </div>
+                    <div class="pipeline-step" id="step-tts_narration">
+                        <div class="step-circle">3</div>
                         <span class="body-sm-bold">음성 및 자막 생성</span>
                     </div>
                     <div class="pipeline-step" id="step-video_assembly">
-                        <div class="step-circle">3</div>
+                        <div class="step-circle">4</div>
                         <span class="body-sm-bold">최종 영상 조립</span>
                     </div>
                 </div>
