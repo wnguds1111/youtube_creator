@@ -280,6 +280,63 @@ async function startPrepare() {
     }
 }
 
+async function startAutoGenerate() {
+    const urlInput = document.getElementById('urlInput');
+    const url = urlInput.value.trim();
+
+    if (!url) {
+        showToast('❌ URL을 입력해주세요');
+        urlInput.focus();
+        return;
+    }
+
+    const btn = document.getElementById('prepareBtn');
+    btn.disabled = true;
+    btn.textContent = '영상 제작 중... (시간이 소요될 수 있습니다)';
+
+    const payload = {
+        url: url,
+        language: 'ko',
+        gemini_model: document.getElementById('optModel').value,
+        tts_voice: document.getElementById('optVoice').value,
+        tts_speed: 1.0,
+        video_width: 1080,
+        video_height: 1920,
+        target_duration: 30,
+        gemini_api_key: document.getElementById('optApiKey').value.trim() || undefined
+    };
+
+    showProgressUI();
+
+    try {
+        const resp = await fetch(`${API_BASE}/api/auto-generate`, {
+            method: 'POST',
+            headers: { 
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${localStorage.getItem(TOKEN_KEY)}`
+            },
+            body: JSON.stringify(payload),
+        });
+
+        if (!resp.ok) {
+            const error = await resp.json();
+            throw new Error(error.detail || '서버 오류');
+        }
+
+        const data = await resp.json();
+        currentJobId = data.job_id;
+        
+        connectWebSocket(currentJobId);
+        startPolling(currentJobId);
+
+    } catch (err) {
+        showError(err.message);
+    } finally {
+        btn.disabled = false;
+        btn.textContent = '원클릭 자동 영상 제작';
+    }
+}
+
 function showUploadUI(content) {
     document.getElementById('inputSection').classList.add('hidden');
     document.getElementById('uploadSection').classList.remove('hidden');
