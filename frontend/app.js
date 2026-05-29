@@ -180,7 +180,10 @@ async function fetchHistory() {
         listEl.innerHTML = '';
         projects.forEach(p => {
             const date = new Date(p.created_at).toLocaleString('ko-KR');
-            let ytStatusHtml = '<span class="badge-success" style="background:var(--colors-surface-soft); color:var(--colors-slate);">업로드 전</span>';
+            let ytStatusHtml = `
+                <span class="badge-success" style="background:var(--colors-surface-soft); color:var(--colors-slate); margin-right: 8px;">업로드 전</span>
+                <button class="button-buy-cta" style="padding: 2px 10px; font-size: 11px; height: 24px;" onclick="event.stopPropagation(); loadProjectAndUpload('${p.project_id}')">바로 업로드</button>
+            `;
             if (p.youtube_status === 'success') {
                 const url = p.youtube_url || '#';
                 ytStatusHtml = `<span class="badge-success">YouTube 완료</span> <a href="${url}" target="_blank" style="color:var(--colors-primary); font-size:12px; margin-left: 8px;">영상 보기</a>`;
@@ -220,6 +223,17 @@ async function loadProject(projectId) {
     } catch (e) {
         showToast('과거 프로젝트를 불러올 수 없습니다.');
     }
+}
+
+async function loadProjectAndUpload(projectId) {
+    await loadProject(projectId);
+    setTimeout(() => {
+        if (document.getElementById('btnYoutubeUpload').style.display !== 'none') {
+            showUploadPreview();
+        } else {
+            showToast('YouTube 인증이 필요합니다.');
+        }
+    }, 800); // UI 렌더링 대기
 }
 
 // ═══════════════════════════════════════

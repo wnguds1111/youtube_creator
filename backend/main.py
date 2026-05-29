@@ -350,9 +350,26 @@ async def auto_generate_video(request: PrepareRequest, username: str = Depends(g
 @app.get("/api/status/{job_id}")
 async def get_status(job_id: str):
     """작업 상태를 조회합니다"""
-    if job_id not in active_jobs:
-        raise HTTPException(status_code=404, detail="Job not found")
-    return JSONResponse(content=active_jobs[job_id])
+    if job_id in active_jobs:
+        return JSONResponse(content=active_jobs[job_id])
+        
+    # 메모리에 없으면 디스크에서 찾아봄 (과거 히스토리 또는 서버 재시작 후)
+    project_dir = os.path.join(OUTPUT_DIR, job_id)
+    metadata_path = os.path.join(project_dir, "metadata.json")
+    if os.path.exists(metadata_path):
+        with open(metadata_path, "r", encoding="utf-8") as f:
+            metadata = json.load(f)
+        return JSONResponse(content={
+            "job_id": job_id,
+            "status": "success",
+            "result": {
+                "project_id": job_id,
+                "metadata": metadata,
+                "video_path": os.path.exists(os.path.join(project_dir, "final_video.mp4"))
+            }
+        })
+        
+    raise HTTPException(status_code=404, detail="Job not found")
 
 
 @app.get("/api/jobs")
