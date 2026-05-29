@@ -36,16 +36,30 @@ class YouTubeUploader:
             client_secrets_path: OAuth 클라이언트 시크릿 JSON 파일 경로
                                  기본값: backend/client_secrets.json
         """
+        import base64
         self.client_secrets = client_secrets_path or os.path.join(
             os.path.dirname(__file__), "client_secrets.json"
         )
         self.service = None
-        self._is_configured = os.path.exists(self.client_secrets)
+        
+        # Railway 등 환경 변수에서 값 주입 처리
+        client_secrets_env = os.getenv("YOUTUBE_CLIENT_SECRETS_JSON")
+        if client_secrets_env and not os.path.exists(self.client_secrets):
+            with open(self.client_secrets, "w", encoding="utf-8") as f:
+                f.write(client_secrets_env)
+                
+        token_path = os.path.join(os.path.dirname(__file__), "youtube_token.pickle")
+        token_base64_env = os.getenv("YOUTUBE_TOKEN_BASE64")
+        if token_base64_env and not os.path.exists(token_path):
+            with open(token_path, "wb") as f:
+                f.write(base64.b64decode(token_base64_env))
+
+        self._is_configured = os.path.exists(self.client_secrets) and os.path.exists(token_path)
 
         if self._is_configured:
             logger.info("📤 YouTubeUploader 초기화")
         else:
-            logger.warning(f"⚠️ YouTube 업로드 미설정: {self.client_secrets} 파일 없음")
+            logger.warning(f"⚠️ YouTube 업로드 미설정: {self.client_secrets} 또는 token.pickle 없음")
 
     @property
     def is_configured(self) -> bool:
