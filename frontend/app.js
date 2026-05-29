@@ -382,30 +382,32 @@ function showUploadUI(content) {
                 ${displayPrompt}
             </div>
             <button class="button-ghost" style="padding: 4px 12px; font-size: 12px; margin-bottom: var(--spacing-sm);" onclick="navigator.clipboard.writeText('${displayPrompt.replace(/'/g, "\\'")}')">프롬프트 복사</button>
-            <label class="body-sm-bold" style="display: block;">
-                영상 첨부 (.mp4):
-                <input type="file" accept="video/mp4" class="text-input vid-input" style="height: auto; padding: 8px; margin-top: 4px;">
-            </label>
         `;
         container.appendChild(div);
     });
+    
+    // 통합 영상 업로드 인풋 추가
+    const uploadDiv = document.createElement('div');
+    uploadDiv.className = 'scene-card';
+    uploadDiv.style.marginTop = 'var(--spacing-md)';
+    uploadDiv.style.border = '2px dashed var(--blue)';
+    uploadDiv.innerHTML = `
+        <h3 class="body-md-bold" style="color: var(--blue); margin-bottom: 8px;">🎥 통합 영상 첨부</h3>
+        <p class="body-sm" style="color: var(--colors-slate); margin-bottom: 12px;">3개의 장면을 하나로 합친 30초짜리 단일 영상을 여기에 올려주세요.</p>
+        <input type="file" id="singleVideoInput" accept="video/mp4" class="text-input" style="height: auto; padding: 12px;">
+    `;
+    container.appendChild(uploadDiv);
 }
 
 async function startAssemble() {
-    const scenesContainer = document.getElementById('scenesContainer');
-    const fileInputs = scenesContainer.querySelectorAll('input.vid-input');
+    const singleInput = document.getElementById('singleVideoInput');
     
     const formData = new FormData();
-    let fileCount = 0;
-    
-    for (const input of fileInputs) {
-        if (input.files.length > 0) {
-            formData.append('files', input.files[0]);
-            fileCount++;
-        } else {
-            showToast('❌ 모든 장면의 영상을 첨부해주세요.');
-            return;
-        }
+    if (singleInput && singleInput.files.length > 0) {
+        formData.append('files', singleInput.files[0]);
+    } else {
+        showToast('❌ 통합 영상을 첨부해주세요.');
+        return;
     }
 
     document.getElementById('uploadSection').classList.add('hidden');

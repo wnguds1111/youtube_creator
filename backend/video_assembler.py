@@ -51,51 +51,96 @@ class VideoAssembler:
         scenes = content_data.get("scenes", [])
         video_clips = []
 
-        for i, audio_info in enumerate(scene_audios):
-            scene_num = audio_info["scene_num"]
-            audio_path = audio_info["path"]
-            narration = audio_info.get("narration", "")
+        is_single_video_mode = (veo_clips is not None and len(veo_clips) == 1)
 
+        if is_single_video_mode:
+            logger.info("🎬 [단일 영상 모드] 1개의 통합 영상에 모든 오디오와 자막을 합성합니다.")
             try:
-                # 오디오 로드
-                audio_clip = AudioFileClip(audio_path)
-                duration = audio_clip.duration
-
-                # 배경 준비 (Veo 클립 > AI 이미지 > 컬러 폴백)
-                bg_clip = self._prepare_background(
-                    scene_num, article_images, scenes, i, veo_clips, duration
-                )
-
-                # 자막 오버레이
+                single_video_path = veo_clips[0]["clip_path"]
+                main_clip = VideoFileClip(single_video_path).resized((self.width, self.height))
+                
+                # 모든 나레이션 오디오 하나로 이어 붙이기
+                from moviepy import concatenate_audioclips
+                audio_clips = []
+                for a_info in scene_audios:
+                    audio_clips.append(AudioFileClip(a_info["path"]))
+                final_audio = concatenate_audioclips(audio_clips)
+                
+                # 메인 비디오 길이 조정
+                if main_clip.duration < final_audio.duration:
+                    import moviepy.video.fx as vfx
+                    main_clip = main_clip.with_effects([vfx.Loop(duration=final_audio.duration)])
+                else:
+                    main_clip = main_clip.subclipped(0, final_audio.duration)
+                    
+                main_clip = main_clip.with_audio(final_audio)
+                
+                # 전체 자막 오버레이
                 subs = self._parse_srt(subtitle_path) if subtitle_path else []
                 if subs:
                     sub_clips = []
                     for start, end, text in subs:
-                        if start >= duration: continue
-                        if end > duration: end = duration
+                        if start >= main_clip.duration: continue
+                        if end > main_clip.duration: end = main_clip.duration
                         sub_dur = end - start
                         sub_img = self._create_subtitle_frame(text)
                         sc = ImageClip(sub_img, duration=sub_dur).with_start(start)
                         sub_clips.append(sc)
                     if sub_clips:
-                        scene_clip = CompositeVideoClip([bg_clip] + sub_clips)
+                        main_clip = CompositeVideoClip([main_clip] + sub_clips)
+                
+                video_clips.append(main_clip)
+                logger.info(f"  ✅ 단일 영상 합성 완료: {main_clip.duration:.1f}초")
+            except Exception as e:
+                logger.error(f"  ❌ 단일 영상 조립 실패: {e}")
+                raise
+        else:
+            # 기존 3개 장면 분할 모드
+            for i, audio_info in enumerate(scene_audios):
+                scene_num = audio_info["scene_num"]
+                audio_path = audio_info["path"]
+                narration = audio_info.get("narration", "")
+
+                try:
+                    # 오디오 로드
+                    audio_clip = AudioFileClip(audio_path)
+                    duration = audio_clip.duration
+
+                    # 배경 준비 (Veo 클립 > AI 이미지 > 컬러 폴백)
+                    bg_clip = self._prepare_background(
+                        scene_num, article_images, scenes, i, veo_clips, duration
+                    )
+
+                    # 자막 오버레이
+                    subs = self._parse_srt(subtitle_path) if subtitle_path else []
+                    if subs:
+                        sub_clips = []
+                        for start, end, text in subs:
+                            if start >= duration: continue
+                            if end > duration: end = duration
+                            sub_dur = end - start
+                            sub_img = self._create_subtitle_frame(text)
+                            sc = ImageClip(sub_img, duration=sub_dur).with_start(start)
+                            sub_clips.append(sc)
+                        if sub_clips:
+                            scene_clip = CompositeVideoClip([bg_clip] + sub_clips)
+                        else:
+                            scene_clip = bg_clip
+                    elif narration:
+                        subtitle_frame = self._create_subtitle_frame(narration)
+                        subtitle_clip = ImageClip(subtitle_frame, duration=duration)
+                        scene_clip = CompositeVideoClip([bg_clip, subtitle_clip])
                     else:
                         scene_clip = bg_clip
-                elif narration:
-                    subtitle_frame = self._create_subtitle_frame(narration)
-                    subtitle_clip = ImageClip(subtitle_frame, duration=duration)
-                    scene_clip = CompositeVideoClip([bg_clip, subtitle_clip])
-                else:
-                    scene_clip = bg_clip
 
-                # 오디오 합성
-                scene_clip = scene_clip.with_audio(audio_clip)
-                video_clips.append(scene_clip)
-                logger.info(f"  ✅ 장면 {scene_num}: {duration:.1f}초")
+                    # 오디오 합성
+                    scene_clip = scene_clip.with_audio(audio_clip)
+                    video_clips.append(scene_clip)
+                    logger.info(f"  ✅ 장면 {scene_num}: {duration:.1f}초")
 
-            except Exception as e:
-                logger.error(f"  ❌ 장면 {scene_num} 조립 실패: {e}")
-                continue
+                except Exception as e:
+                    logger.error(f"  ❌ 장면 {scene_num} 조립 실패: {e}")
+                    continue
 
         if not video_clips:
             raise RuntimeError("조립 가능한 장면이 없습니다")
