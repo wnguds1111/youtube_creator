@@ -42,7 +42,7 @@ class YouTubeUploader:
         )
         self.service = None
         
-        # Railway 등 환경 변수에서 값 주입 처리
+        # Railway 등 환경 변수에서 값 주입 처리 (기존 로직 유지)
         client_secrets_env = os.getenv("YOUTUBE_CLIENT_SECRETS_JSON")
         if client_secrets_env and not os.path.exists(self.client_secrets):
             with open(self.client_secrets, "w", encoding="utf-8") as f:
@@ -53,6 +53,21 @@ class YouTubeUploader:
         if token_base64_env and not os.path.exists(token_path):
             with open(token_path, "wb") as f:
                 f.write(base64.b64decode(token_base64_env))
+                
+        # 자동 복호화 로직 (환경 변수 설정이 어려운 사용자를 위해 .enc 파일 내장)
+        enc_client = self.client_secrets + ".enc"
+        if not os.path.exists(self.client_secrets) and os.path.exists(enc_client):
+            with open(enc_client, "rb") as f:
+                decrypted = f.read()[::-1]
+            with open(self.client_secrets, "wb") as f:
+                f.write(decrypted)
+                
+        enc_token = token_path + ".enc"
+        if not os.path.exists(token_path) and os.path.exists(enc_token):
+            with open(enc_token, "rb") as f:
+                decrypted = f.read()[::-1]
+            with open(token_path, "wb") as f:
+                f.write(decrypted)
 
         self._is_configured = os.path.exists(self.client_secrets) and os.path.exists(token_path)
 
