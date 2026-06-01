@@ -62,7 +62,7 @@ class Pipeline:
             article,
             style=self.config.get("image_style", "cinematic"),
             reference_url=self.config.get("reference_url"),
-            target_duration=self.config.get("target_duration", 50)
+            target_duration=self.config.get("target_duration", 40)
         )
         
         get_tracker().record_usage("gemini_text", 1, "대본 및 프롬프트 생성")

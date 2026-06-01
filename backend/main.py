@@ -79,7 +79,7 @@ class PrepareRequest(BaseModel):
     tts_speed: float = 1.0
     video_width: int = 1080
     video_height: int = 1920
-    target_duration: int = 50
+    target_duration: int = 40
     gemini_api_key: Optional[str] = None
     omni_template: Optional[str] = None
     tts_voice: Optional[str] = "Puck"

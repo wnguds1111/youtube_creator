@@ -88,7 +88,7 @@ class ScriptGenerator:
         
         style_instruction = ""
         if omni_template:
-            style_instruction = f"이 영상은 Omni 템플릿 '{omni_template}' 스타일로 제작됩니다. 중요: 3개의 모든 장면(scene)의 `visual_prompt` 시작 부분에 반드시 `[{omni_template} style],` 이라는 지시어를 똑같이 고정값으로 적어주세요. 이를 통해 3개의 영상 클립 전체가 완벽하게 동일한 시각적 컨셉을 유지해야 합니다."
+            style_instruction = f"이 영상은 Omni 템플릿 '{omni_template}' 스타일로 제작됩니다. 중요: 4개의 모든 장면(scene)의 `visual_prompt` 시작 부분에 반드시 `[{omni_template} style],` 이라는 지시어를 똑같이 고정값으로 적어주세요. 이를 통해 4개의 영상 클립 전체가 완벽하게 동일한 시각적 컨셉을 유지해야 합니다."
         elif style == "photorealistic":
             style_instruction = "이 영상은 '극사실주의(Photorealistic) 실사' 스타일로 제작됩니다. visual_prompt 작성 시 반드시 실사, 카메라 촬영, 8k 화질, 자연광 등의 키워드를 강조하세요."
         elif style == "animation":
@@ -140,19 +140,26 @@ class ScriptGenerator:
 
 ### 6. 나레이션 대본 (narration_script)
 - 전체 나레이션을 하나의 연속된 텍스트로 작성
-- **[매우 중요]** 영상 길이가 정확히 30초(각 장면 10초씩)이므로, 음성 TTS가 30초에 딱 맞게 꽉 차도록 **전체 글자 수를 150자~170자 내외(공백 포함)**로 적절하고 밀도 있게 작성하세요. (너무 짧으면 오디오가 비고, 너무 길면 잘립니다.)
-- 반드시 '기(Hook/도입) → 승(전개) → 전(반전/절정) → 결(마무리)'의 4단계 기승전결 스토리텔링 구조가 명확하게 드러나도록 작성
+- **[매우 중요]** 영상 길이가 정확히 40초(각 장면 10초씩)이므로, 음성 TTS가 40초에 딱 맞게 꽉 차도록 **전체 글자 수를 200자~220자 내외(공백 포함)**로 적절하고 밀도 있게 작성하세요. (너무 짧으면 오디오가 비고, 너무 길면 잘립니다.)
+- **[기승전결 4단계 구성 원칙]** 4개의 장면이 각각 기승전결(도입-전개-반전-결론)의 명확하고 몰입감 있는 흐름을 형성해야 합니다.
+  - **Scene 1 (기 - 3초 초강력 훅):** 호기심이나 반전을 유발하는 강렬한 첫마디로 시청자의 이탈을 방지하세요. (예: "엔비디아 다 팔았는데도, 서학개미들이 조용히 쓸어담은 반도체 주식이 있습니다.")
+  - **Scene 2 (승 - 상세 전개):** 도입부에서 제시한 정보를 뒷받침하는 핵심 팩트를 구체적으로 알려주세요.
+  - **Scene 3 (전 - 대조/반전):** 정보의 가장 놀랍거나 흥미로운 피크(Peak)를 대조나 반전을 활용해 극대화하세요.
+  - **Scene 4 (결 - 결론/안정적 마감):** 기사의 최종 결과 및 정리된 결론을 명확하고 깔끔하게 마감하여 독자에게 정보를 완전하게 전달하세요.
+- **[쉬운 단어와 명확한 팩트]** 복잡한 전문 금융 지표나 어려운 용어(예: 순매도 우위 기조, 보관 잔액 등)는 배제하고, 누구나 듣자마자 바로 이해할 수 있는 직관적인 구어체 표현(예: 주식을 대거 팔면서도, 보유한 주식 가치 등)을 사용하여 정확한 정보만 전달하세요.
 - 세로형 영상(9:16)에 어울리는 빠른 템포와 강렬한 흡입력
 - 주의: 마무리 인사나 "구독, 좋아요" 멘트는 절대 넣지 말고 임팩트 있게 끝내세요.
 
 ### 7. 장면 구성 (scenes)
-- 전체 내용을 반드시 **정확히 3개의 장면(scene)**으로 나누세요. (10초짜리 영상 3개를 연결하기 위함입니다.)
+- 전체 내용을 반드시 **정확히 4개의 장면(scene)**으로 나누세요. (10초짜리 영상 4개를 연결하기 위함입니다.)
 - 각 장면:
-  - scene_num: 1, 2, 3
+  - scene_num: 1, 2, 3, 4
   - narration: 각 장면에 해당하는 나레이션 대사 배분 (합치면 전체 나레이션과 동일해야 함)
-  - visual_prompt: 외부 AI 비디오 생성기에 복사해서 붙여넣기 좋게 아주 간결한 영어 단어 위주로 작성할 것 (최대 20단어). 세로형 9:16 비율에 맞춘 시각적 묘사. 주의: 프롬프트에 글자, 텍스트, 한자(중문), 영어 단어, 로고, 캡션 등을 생성하라는 내용은 절대 포함하지 마세요. (Absolutely NO Chinese characters, NO text, NO letters, NO words, NO logos)
-  - duration_sec: 각 10초 (총 30초 내외)
-- **중요(Style Consistency):** 3개의 `visual_prompt`는 캐릭터, 배경, 색감 등 시각적 스타일이 최대한 일관되게(Consistent visual style) 유지되도록 작성해야 합니다.
+  - visual_prompt: 외부 AI 비디오 생성기에 복사해서 붙여넣기 좋게 아주 구체적이고 프리미엄 영상 스타일이 드러나도록 **영어로 작성**하세요 (15~25단어 내외). 
+  - **[비주얼 스타일 일관성 (Style Consistency)]** 4개 장면이 완전히 일치하는 세계관과 화풍을 공유해야 합니다. 동일한 캐릭터, 통일된 컬러 팔레트(Color palette), 유사한 실내/외 배경 테마, 일관된 카메라 톤을 묘사하세요.
+  - **[비디오 생성 퀄리티 향상 지침]** 고품질 비디오를 위해 카메라 움직임(예: Slow cinematic pan, dynamic close-up, drone shot, zoom), 조명(예: Volumetric lighting, warm glowing neon, cinematic shadows), 디테일(예: 8k, photorealistic textures, hyper-detailed)을 명확히 명시하세요.
+  - **[텍스트 절대 배제]** 프롬프트에 글자, 텍스트, 한자(중문), 영어 단어, 로고, 캡션 등을 생성하라는 내용은 절대 포함하지 마세요. (Absolutely NO Chinese characters, NO text, NO letters, NO words, NO logos)
+  - duration_sec: 각 10초 (총 40초 내외)
 
 ### 8. 태그 (tags)
 - 유튜브 SEO용 태그 10~15개 (한국어)
@@ -162,6 +169,7 @@ class ScriptGenerator:
 - visual_prompt만 영어로 작성 (9:16 세로형 포맷 강조, 텍스트/한자/글자/단어 등 절대 포함 금지)
 - 자극적이되 허위 정보는 절대 포함하지 않기
 - 원본 기사의 사실 관계를 정확히 유지
+- **시청자가 중도에 이탈하지 않도록 직관적이고 귀에 꽂히는 짧은 호흡의 문장을 사용할 것**
 
 ## 응답 형식
 반드시 아래 JSON 구조로만 응답하세요:
@@ -187,6 +195,12 @@ class ScriptGenerator:
         }},
         {{
             "scene_num": 3,
+            "narration": "...",
+            "visual_prompt": "...",
+            "duration_sec": 10
+        }},
+        {{
+            "scene_num": 4,
             "narration": "...",
             "visual_prompt": "...",
             "duration_sec": 10
@@ -230,6 +244,12 @@ class ScriptGenerator:
                 {
                     "scene_num": 3,
                     "narration": article['text'][400:600] if len(article['text']) > 400 else "...",
+                    "visual_prompt": "News broadcast studio with modern graphics, vertical 9:16",
+                    "duration_sec": 10
+                },
+                {
+                    "scene_num": 4,
+                    "narration": article['text'][600:800] if len(article['text']) > 600 else "...",
                     "visual_prompt": "News broadcast studio with modern graphics, vertical 9:16",
                     "duration_sec": 10
                 }

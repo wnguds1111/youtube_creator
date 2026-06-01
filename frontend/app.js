@@ -262,7 +262,7 @@ async function startPrepare() {
         tts_speed: 1.0,
         video_width: 1080,
         video_height: 1920,
-        target_duration: 30,
+        target_duration: 40,
         gemini_api_key: document.getElementById('optApiKey').value.trim() || undefined,
         omni_template: document.getElementById('optOmniTemplate').value || undefined
     };
@@ -317,7 +317,7 @@ async function startAutoGenerate() {
         tts_speed: 1.0,
         video_width: 1080,
         video_height: 1920,
-        target_duration: 30,
+        target_duration: 40,
         gemini_api_key: document.getElementById('optApiKey').value.trim() || undefined,
         omni_template: document.getElementById('optOmniTemplate').value || undefined
     };
@@ -407,7 +407,7 @@ function showUploadUI(content) {
     uploadDiv.style.border = '2px dashed var(--blue)';
     uploadDiv.innerHTML = `
         <h3 class="body-md-bold" style="color: var(--blue); margin-bottom: 8px;">🎥 통합 영상 첨부</h3>
-        <p class="body-sm" style="color: var(--colors-slate); margin-bottom: 12px;">3개의 장면을 하나로 합친 30초짜리 단일 영상을 여기에 올려주세요.</p>
+        <p class="body-sm" style="color: var(--colors-slate); margin-bottom: 12px;">4개의 장면을 하나로 합친 40초짜리 단일 영상을 여기에 올려주세요.</p>
         <input type="file" id="singleVideoInput" accept="video/mp4" class="text-input" style="height: auto; padding: 12px;">
     `;
     container.appendChild(uploadDiv);
