@@ -161,7 +161,7 @@ class VideoAssembler:
             codec="libx264",
             audio_codec="aac",
             preset="medium",
-            bitrate="8000k",
+            bitrate="20000k",
             threads=4,
             logger=None,
             temp_audiofile=temp_audio,

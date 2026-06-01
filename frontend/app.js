@@ -260,8 +260,8 @@ async function startPrepare() {
         gemini_model: document.getElementById('optModel').value,
         tts_voice: document.getElementById('optVoice').value,
         tts_speed: 1.0,
-        video_width: 1080,
-        video_height: 1920,
+        video_width: 1440,
+        video_height: 2560,
         target_duration: 40,
         gemini_api_key: document.getElementById('optApiKey').value.trim() || undefined,
         omni_template: document.getElementById('optOmniTemplate').value || undefined
@@ -315,8 +315,8 @@ async function startAutoGenerate() {
         gemini_model: document.getElementById('optModel').value,
         tts_voice: document.getElementById('optVoice').value,
         tts_speed: 1.0,
-        video_width: 1080,
-        video_height: 1920,
+        video_width: 1440,
+        video_height: 2560,
         target_duration: 40,
         gemini_api_key: document.getElementById('optApiKey').value.trim() || undefined,
         omni_template: document.getElementById('optOmniTemplate').value || undefined

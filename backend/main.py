@@ -77,8 +77,8 @@ class PrepareRequest(BaseModel):
     gemini_model: str = "gemini-2.5-flash"
     tts_voice: str = "Kore"
     tts_speed: float = 1.0
-    video_width: int = 1080
-    video_height: int = 1920
+    video_width: int = 1440
+    video_height: int = 2560
     target_duration: int = 40
     gemini_api_key: Optional[str] = None
     omni_template: Optional[str] = None
